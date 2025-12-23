@@ -1,8 +1,8 @@
-/*============================================================================*/
-/** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
+﻿/*============================================================================*/
+/** Copyright (C) 2009-2018, 10086 INFRASTRUCTURE SOFTWARE CO.,LTD.
  *  
- *  All rights reserved. This software is iSOFT property. Duplication 
- *  or disclosure without iSOFT written authorization is prohibited.
+ *  All rights reserved. This software is 10086 property. Duplication 
+ *  or disclosure without 10086 written authorization is prohibited.
  *  
  *  @file       <Cal.h>
  *  @brief      <function declarations for Cal>
@@ -40,3 +40,4 @@ extern void Cal_CrcFinalize(SecM_CRCType *curCrc);
 #endif/* end of CAL_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/
+

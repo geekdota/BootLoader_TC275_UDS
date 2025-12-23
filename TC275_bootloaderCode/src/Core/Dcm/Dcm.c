@@ -1,8 +1,8 @@
-/*============================================================================*/
-/** Copyright (C) 2009-2017, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
+﻿/*============================================================================*/
+/** Copyright (C) 2009-2017, 10086 INFRASTRUCTURE SOFTWARE CO.,LTD.
  *
- *  All rights reserved. This software is iSOFT property. Duplication
- *  or disclosure without iSOFT written authorization is prohibited.
+ *  All rights reserved. This software is 10086 property. Duplication
+ *  or disclosure without 10086 written authorization is prohibited.
  *
  *  @file       <Dcm.c>
  *  @brief      <UDS Service - ISO14229>
@@ -1361,3 +1361,4 @@ void PosResponse255(void)
     return;
 }
 /*=======[E N D   O F   F I L E]==============================================*/
+

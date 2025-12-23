@@ -1,7 +1,7 @@
-
-/** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
+﻿
+/** Copyright (C) 2009-2018, 10086 INFRASTRUCTURE SOFTWARE CO.,LTD.
  *
- *  All rights reserved. This software is iSOFT property. Duplication
+ *  All rights reserved. This software is 10086 property. Duplication
 
  *
  *  @file       <Flash.c>
@@ -679,3 +679,4 @@ void FlashReadMemory(uint8 *DataBuf, uint32 Addr, uint32 Length)
  *  V1.0    20120909    Gary       Initial version
  */
 /*=======[E N D   O F   F I L E]==============================================*/
+

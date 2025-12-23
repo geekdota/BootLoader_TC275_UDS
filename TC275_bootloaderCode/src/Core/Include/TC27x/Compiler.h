@@ -1,10 +1,10 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 **                                                                            **
-** Copyright (C) iSOFT   (2016)                                               **
+** Copyright (C) 10086   (2016)                                               **
 **                                                                            **
 ** All rights reserved.                                                       **
 **                                                                            **
-** This document contains proprietary information belonging to iSOFT.         **
+** This document contains proprietary information belonging to 10086.         **
 ** Passing on and copying of this document, and communication                 **
 ** of its contents is not permitted without prior written authorization.      **
 **                                                                            **
@@ -56,7 +56,7 @@
 #define INLINE
 
 /* The compiler abstraction shall provide the LOCAL_INLINE define for abstraction
-   of the keyword inline in functions with 鈥渟tatic鈥� scope.
+   of the keyword inline in functions with 閳ユ笩tatic閳ワ拷 scope.
  */
 #define LOCAL_INLINE
 
@@ -170,3 +170,4 @@
 #endif /* end of COMPILER_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/
+

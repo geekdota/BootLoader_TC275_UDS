@@ -1,8 +1,8 @@
-/*============================================================================*/
-/** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
+﻿/*============================================================================*/
+/** Copyright (C) 2009-2018, 10086 INFRASTRUCTURE SOFTWARE CO.,LTD.
  *
- *  All rights reserved. This software is iSOFT property. Duplication
- *  or disclosure without iSOFT written authorization is prohibited.
+ *  All rights reserved. This software is 10086 property. Duplication
+ *  or disclosure without 10086 written authorization is prohibited.
  *
  * @file 	CanIf_Cfg.c
  * @brief
@@ -39,3 +39,4 @@ const CanIf_RxChannelType CanIfRxCh[CANIF_RX_CHANNEL_NUM] =
         {(uint16)0x01U, (uint16)0x12U, (uint32)0x214U, (uint8)0x02U, &CanTp_RxIndication}};
 
 /*=======[E N D   O F   F I L E]==============================================*/
+

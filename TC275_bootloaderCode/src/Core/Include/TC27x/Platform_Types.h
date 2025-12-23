@@ -1,8 +1,8 @@
-/*============================================================================*/
-/*  Copyright (C) 2016, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
+﻿/*============================================================================*/
+/*  Copyright (C) 2016, 10086 INFRASTRUCTURE SOFTWARE CO.,LTD.
  *
- *  All rights reserved. This software is iSOFT property. Duplication
- *  or disclosure without iSOFT written authorization is prohibited.
+ *  All rights reserved. This software is 10086 property. Duplication
+ *  or disclosure without 10086 written authorization is prohibited.
  *
  *  @file       <MemMap.h>
  *  @brief      <Briefly describe file(one line)>
@@ -114,3 +114,4 @@ typedef signed long sint32_least; /* At least 31 bit + 1 bit sign  */
 #endif /* end of PLATFORM_TYPES_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/
+
