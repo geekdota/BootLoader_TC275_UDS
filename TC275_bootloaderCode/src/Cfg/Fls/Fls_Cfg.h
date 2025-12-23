@@ -9,11 +9,11 @@
  *  @brief      <Flash Driver Configuration file>
  *               describe the falsh driver version and clock set.
  *
- *  @author     <Gary Chen>
+ *  @author     <10086>
  *  @date       <2012-09-09>
  *
  *
- *  @author     <Chen Cheng>
+ *  @author     <10086>
  *  @date       <2018-05-09>
  */
 /*============================================================================*/
@@ -24,10 +24,10 @@
 #define FLS_USED STD_OFF
 
 /** Motorola Star12 */
-#define TFLASH_DRIVER_VERSION_MCUTYPE   0x12u
+#define TFLASH_DRIVER_VERSION_MCUTYPE 0x12u
 
 /** some mask number */
-#define TFLASH_DRIVER_VERSION_MASKTYPE  0xabu
+#define TFLASH_DRIVER_VERSION_MASKTYPE 0xabu
 
 /** interface version number */
 #define TFLASH_DRIVER_VERSION_INTERFACE 0x01u
@@ -45,10 +45,10 @@
 #define TFLASH_COMPILED STD_OFF
 
 /* Eight 16k, one 128k nine 256k */
-#define FLASH_ONE_SECTOR               (16*1024)
+#define FLASH_ONE_SECTOR (16 * 1024)
 
-#define FLASH_ONE_PHRASE               8u
-#endif/* endof FLASH_CFG_H */
+#define FLASH_ONE_PHRASE 8u
+#endif /* endof FLASH_CFG_H */
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>

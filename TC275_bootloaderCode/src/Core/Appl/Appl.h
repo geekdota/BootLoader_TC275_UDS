@@ -1,16 +1,16 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
- *  
+ *
+ *
  *  @file       <Appl.h>
  *  @brief      <function declarations for Appl>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
- *  
- *  @author     <Gary Chen>
+ *
+ *  @author     <10086>
  *  @date       <2012-12-27>
  */
 /*============================================================================*/
@@ -40,7 +40,7 @@ extern FL_ResultType Appl_EcuStartup(void);
 extern FL_ResultType Appl_FlStartup(void);
 
 #if (FL_SLEEP_TIMER > 0)
-extern void Appl_EcuShutdown (void);
+extern void Appl_EcuShutdown(void);
 #endif
 
 extern void Appl_EcuReset(void);
@@ -49,9 +49,9 @@ extern FL_ResultType Appl_CheckConsistency(void);
 
 extern void Appl_UpdateTriggerCondition(void);
 
-extern void Appl_Memcpy(uint8 * dest, const uint8 *source, uint32 length);
+extern void Appl_Memcpy(uint8 *dest, const uint8 *source, uint32 length);
 
-extern void Appl_Memset(uint8 * dest, const uint8 source, uint32 length);
+extern void Appl_Memset(uint8 *dest, const uint8 source, uint32 length);
 #endif
 /* end of APPL_H */
 

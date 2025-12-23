@@ -1,17 +1,17 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
- *  
+ *
+ *
  *  @file       <SecM.h>
  *  @brief      <Macros,Types defines and function declarations for Security
  *              Module>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <Gary Chen>
+ *  @author     <10086>
  *  @date       <2012-11-09>
  */
 /*============================================================================*/
@@ -38,25 +38,25 @@
 /** CRC buffer length */
 #define SECM_CRC_BUFFER_LEN 100
 
-#define SECM_OK            (uint8)0x00U
-#define SECM_NOT_OK    (uint8)0x01U
+#define SECM_OK (uint8)0x00U
+#define SECM_NOT_OK (uint8)0x01U
 
 /** CRC step */
-#define SECM_CRC_INIT	    0x00u
-#define SECM_CRC_COMPUTE	0x01u
-#define SECM_CRC_FINALIZE	0x02u
+#define SECM_CRC_INIT 0x00u
+#define SECM_CRC_COMPUTE 0x01u
+#define SECM_CRC_FINALIZE 0x02u
 
 #if (CAL_CRC32 == CAL_METHOD)
-#define SECM_CRC_LENGTH     0x04u
+#define SECM_CRC_LENGTH 0x04u
 #else
-#define SECM_CRC_LENGTH     0x02u
+#define SECM_CRC_LENGTH 0x02u
 #endif
 
 /* frc base address */
-#define FRC_REG_BASE                    (0x40u)
-#define FRC_TCNTH                       (0x04u)
-#define FRC_TCNTL                       (0x05u)
-#define FRC_TSCR1                       (0x06u)
+#define FRC_REG_BASE (0x40u)
+#define FRC_TCNTH (0x04u)
+#define FRC_TCNTL (0x05u)
+#define FRC_TSCR1 (0x06u)
 
 /*=======[T Y P E   D E F I N I T I O N S]====================================*/
 /** return type for SecM module */
@@ -129,6 +129,6 @@ extern SecM_StatusType SecM_Verification(SecM_VerifyParamType *verifyParam);
 extern void Frc_Init(void);
 extern void Frc_Uninit(void);
 #endif
-#endif/* endof SECM_H */
+#endif /* endof SECM_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/

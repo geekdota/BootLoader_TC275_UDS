@@ -1,28 +1,28 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <FL.c>
  *  @brief      <His Flash Loader >
- *  
+ *
  *  < The Code process checksum,erase and program for bootloader project>
  *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <cyWang>
+ *  @author     <10086>
  *  @date       <2016-10-25>
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *     V1.0   20121227   Gary       Initial version
+ *     V1.0   20121227   10086       Initial version
  *
- *     V1.1   20160801   cyWang        update
+ *     V1.1   20160801   10086        update
  *
- *     V1.2   20180511   CChen         update
+ *     V1.2   20180511   10086         update
  */
 /*============================================================================*/
 
@@ -37,24 +37,24 @@
 
 /*=======[M A C R O S]========================================================*/
 /* macro of ECU Hardware Number length */
-#define HW_VER_LENGTH         16
+#define HW_VER_LENGTH 16
 /* macro of Boot Software Identification length */
-#define SW_REFNUM_LENGTH         10
+#define SW_REFNUM_LENGTH 10
 /* the length of programming counter */
-#define PROG_COUNTER_LENGTH    1
+#define PROG_COUNTER_LENGTH 1
 /* the length of programming attempt counter */
-#define PROG_ATTEMPT_LENGTH    1
+#define PROG_ATTEMPT_LENGTH 1
 
 /*=======[T Y P E   D E F I N I T I O N S]====================================*/
 /** flashloader job status */
 typedef enum
 {
     FL_JOB_IDLE,
-    
+
     FL_JOB_ERASING,
-    
+
     FL_JOB_PROGRAMMING,
-    
+
     FL_JOB_CHECKING
 
 } FL_ActiveJobType;
@@ -63,11 +63,11 @@ typedef enum
 typedef enum
 {
     FL_REQUEST_STEP,
-    
+
     FL_TRANSFER_STEP,
-    
+
     FL_EXIT_TRANSFER_STEP,
-    
+
     FL_CHECKSUM_STEP
 
 } FL_DownloadStepType;
@@ -76,7 +76,7 @@ typedef enum
 typedef struct
 {
     /* flag if finger print has written to NVM */
-	 boolean fingerPrintWrittenFlag;
+    boolean fingerPrintWrittenFlag;
     /* repair shop code buffer */
     /* flag if finger print has written */
     boolean fingerPrintWritten;
@@ -134,16 +134,15 @@ FL_NvmInfoType FL_NvmInfo;
 #define BL_NvmInf 1
 #if BL_NvmInf
 #pragma section ".BL_NvmInf" aw
-const uint8 BL_Information[FL_NUM_LOGICAL_BLOCKS*20+4] ={0x00};
+const uint8 BL_Information[FL_NUM_LOGICAL_BLOCKS * 20 + 4] = {0x00};
 #pragma section
 #endif
 
 /*=======[I N T E R N A L   D A T A]==========================================*/
 /* save the data which not aligned */
 STATIC FL_RemainDataType FL_RemainDataStruct =
-{
-    0UL, 0UL
-};
+    {
+        0UL, 0UL};
 /** flashloader status information */
 STATIC FL_DownloadStateType FldownloadStatus;
 /** flashloader program buffer */
@@ -152,18 +151,17 @@ STATIC uint8 FlProgramData[FL_PROGRAM_SIZE];
 STATIC uint32 FlProgramLength = 0UL;
 /** flash driver API input parameter */
 STATIC tFlashParam flashParamInfo =
-{
-    (uint8)FLASH_DRIVER_VERSION_PATCH,
-    (uint8)FLASH_DRIVER_VERSION_MINOR,
-    (uint8)FLASH_DRIVER_VERSION_MAJOR,
-    (uint8)0x00u,
-    (uint8)kFlashOk,
-    (uint16)0x0000U,
-    0UL,
-    0UL,
-    NULL_PTR,
-	&Appl_UpdateTriggerCondition
-};
+    {
+        (uint8)FLASH_DRIVER_VERSION_PATCH,
+        (uint8)FLASH_DRIVER_VERSION_MINOR,
+        (uint8)FLASH_DRIVER_VERSION_MAJOR,
+        (uint8)0x00u,
+        (uint8)kFlashOk,
+        (uint16)0x0000U,
+        0UL,
+        0UL,
+        NULL_PTR,
+        &Appl_UpdateTriggerCondition};
 
 /*=======[I N T E R N A L   F U N C T I O N   D E C L A R A T I O N S]========*/
 STATIC FL_ResultType FL_Erasing(void);
@@ -183,7 +181,7 @@ STATIC FL_ResultType FL_UpdateNvm(void);
 /******************************************************************************/
 /**
  * @brief               <flashloader module initialize>
- * 
+ *
  * <initialize download status> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -191,21 +189,21 @@ STATIC FL_ResultType FL_UpdateNvm(void);
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void FL_InitState(void)
 {
-	#if BL_NvmInf
-	uint8 i = 0;
-	if((0 == i) && (0 == BL_Information[0]))
-	{
-		i = 1;
-	}
-	#endif
+#if BL_NvmInf
+    uint8 i = 0;
+    if ((0 == i) && (0 == BL_Information[0]))
+    {
+        i = 1;
+    }
+#endif
 
-	/* finger print is not written to NVM*/
-	FldownloadStatus.fingerPrintWrittenFlag = FALSE;
+    /* finger print is not written to NVM*/
+    FldownloadStatus.fingerPrintWrittenFlag = FALSE;
     /* finger print is not written */
     FldownloadStatus.fingerPrintWritten = FALSE;
 
@@ -229,7 +227,7 @@ void FL_InitState(void)
 /******************************************************************************/
 /**
  * @brief               <read data by identifier for 0x22>
- * 
+ *
  * <read data by identifier for 0x22> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -237,7 +235,7 @@ void FL_InitState(void)
  * @param[in]           <NONE>
  * @param[out]          <readData (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint16>    
+ * @return              <uint16>
  */
 /******************************************************************************/
 uint16 FL_ReadProgCounter(uint8 *readData)
@@ -251,7 +249,7 @@ uint16 FL_ReadProgCounter(uint8 *readData)
 /******************************************************************************/
 /**
  * @brief               <read data by identifier for 0x22>
- * 
+ *
  * <read data by identifier for 0x22> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -259,7 +257,7 @@ uint16 FL_ReadProgCounter(uint8 *readData)
  * @param[in]           <NONE>
  * @param[out]          <readData (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint16>    
+ * @return              <uint16>
  */
 /******************************************************************************/
 uint16 FL_ReadProgAttemptCounter(uint8 *readData)
@@ -273,7 +271,7 @@ uint16 FL_ReadProgAttemptCounter(uint8 *readData)
 /******************************************************************************/
 /**
  * @brief               <read data by identifier for 0x22>
- * 
+ *
  * <read data by identifier for 0x22> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -281,19 +279,18 @@ uint16 FL_ReadProgAttemptCounter(uint8 *readData)
  * @param[in]           <NONE>
  * @param[out]          <readData (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint16>    
+ * @return              <uint16>
  */
 /******************************************************************************/
 uint16 FL_ReadBootSWReferenceNumber(uint8 *readData)
 {
-    uint8       dataIndex;
+    uint8 dataIndex;
 
     /* Boot Software Identification, ASCII code */
     const uint8 SWRefNum[SW_REFNUM_LENGTH] =
-    {
-        (uint8)0x41u, (uint8)0x41u, (uint8)0x41u, (uint8)0x20u, (uint8)0x18u,
-        (uint8)0x05u, (uint8)0x16u, (uint8)0x30u, (uint8)0x30u, (uint8)0x30u
-    };
+        {
+            (uint8)0x41u, (uint8)0x41u, (uint8)0x41u, (uint8)0x20u, (uint8)0x18u,
+            (uint8)0x05u, (uint8)0x16u, (uint8)0x30u, (uint8)0x30u, (uint8)0x30u};
 
     for (dataIndex = (uint8)0; dataIndex < (uint8)SW_REFNUM_LENGTH; dataIndex++)
     {
@@ -326,8 +323,7 @@ uint16 FL_ReadFingerPrint(uint8 *readData)
         /* get fingerprint from NVM*/
         for (length = 0; length < FL_FINGER_PRINT_LENGTH; length++)
         {
-            FL_NvmInfo.blockInfo[0].fingerPrint[length]
-               = *(uint8 *)(FL_NVM_INFO_ADDRESS + FL_FINGER_PRINT_OFFSET + length);
+            FL_NvmInfo.blockInfo[0].fingerPrint[length] = *(uint8 *)(FL_NVM_INFO_ADDRESS + FL_FINGER_PRINT_OFFSET + length);
 
             *readData = (uint8)FL_NvmInfo.blockInfo[0].fingerPrint[length];
             readData++;
@@ -343,14 +339,13 @@ uint16 FL_ReadFingerPrint(uint8 *readData)
         }
     }
 
-
     return FL_FINGER_PRINT_LENGTH;
 }
 
 /******************************************************************************/
 /**
  * @brief               <read data by identifier for 0x22>
- * 
+ *
  * <read data by identifier for 0x22> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -358,21 +353,20 @@ uint16 FL_ReadFingerPrint(uint8 *readData)
  * @param[in]           <NONE>
  * @param[out]          <readData (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint16>    
+ * @return              <uint16>
  */
 /******************************************************************************/
 uint16 FL_ReadSysECUHWVer(uint8 *readData)
 {
-    uint8       dataIndex;
+    uint8 dataIndex;
 
     /* System Supplier ECU Hardware Version Number, ASCII code */
     const uint8 HWVer[HW_VER_LENGTH] =
-    {
-        (uint8)0x01u, (uint8)0x02u, (uint8)0x03u, (uint8)0x04u, (uint8)0x05u,
-        (uint8)0x06u, (uint8)0x07u, (uint8)0x08u, (uint8)0x09u, (uint8)0x0Au,
-        (uint8)0x0Bu, (uint8)0x0Cu, (uint8)0x0Du, (uint8)0x0Eu, (uint8)0x0Fu,
-        (uint8)0x10u
-    };
+        {
+            (uint8)0x01u, (uint8)0x02u, (uint8)0x03u, (uint8)0x04u, (uint8)0x05u,
+            (uint8)0x06u, (uint8)0x07u, (uint8)0x08u, (uint8)0x09u, (uint8)0x0Au,
+            (uint8)0x0Bu, (uint8)0x0Cu, (uint8)0x0Du, (uint8)0x0Eu, (uint8)0x0Fu,
+            (uint8)0x10u};
 
     for (dataIndex = (uint8)0; dataIndex < (uint8)HW_VER_LENGTH; dataIndex++)
     {
@@ -386,8 +380,8 @@ uint16 FL_ReadSysECUHWVer(uint8 *readData)
 /******************************************************************************/
 /**
  * @brief               <read memory for checksum>
- * 
- * <Needed by the security module to read only those memory areas that are in 
+ *
+ * <Needed by the security module to read only those memory areas that are in
  *  the scope of the flashloader (e.g. not erase/write protected, not RAM, ...)> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -395,20 +389,19 @@ uint16 FL_ReadSysECUHWVer(uint8 *readData)
  * @param[in]           <address (IN), length (IN)>
  * @param[out]          <data (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint32>    
+ * @return              <uint32>
  */
 /******************************************************************************/
-uint32 FL_ReadMemory(uint32 address, uint32 length, uint8 * data)
+uint32 FL_ReadMemory(uint32 address, uint32 length, uint8 *data)
 {
     uint32 readLength = 0UL;
-    uint8  curBlockIndex = (uint8)0;
+    uint8 curBlockIndex = (uint8)0;
 
     /* read data from flash block */
     for (curBlockIndex = (uint8)0; curBlockIndex < FL_NUM_LOGICAL_BLOCKS; curBlockIndex++)
     {
         /* check if address is in range of logical blocks */
-        if ((address >= FL_BlkInfo[curBlockIndex].address)
-         && (address < (FL_BlkInfo[curBlockIndex].address + FL_BlkInfo[curBlockIndex].length)))
+        if ((address >= FL_BlkInfo[curBlockIndex].address) && (address < (FL_BlkInfo[curBlockIndex].address + FL_BlkInfo[curBlockIndex].length)))
         {
             FlashReadMemory(data, address, length);
             readLength = length;
@@ -443,7 +436,7 @@ uint32 FL_ReadMemory(uint32 address, uint32 length, uint8 * data)
 /******************************************************************************/
 /**
  * @brief               <0x31 check program pre-condition>
- * 
+ *
  * <0x31 check program pre-condition .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -451,10 +444,10 @@ uint32 FL_ReadMemory(uint32 address, uint32 length, uint8 * data)
  * @param[in]           <NONE>
  * @param[out]          <conditions (OUT)>
  * @param[in/out]       <NONE>
- * @return              <uint8>    
+ * @return              <uint8>
  */
 /******************************************************************************/
-uint8 FL_CheckProgPreCondition(uint8 * conditions)
+uint8 FL_CheckProgPreCondition(uint8 *conditions)
 {
     /* defined by user */
     *conditions = (uint8)0x00u;
@@ -465,7 +458,7 @@ uint8 FL_CheckProgPreCondition(uint8 * conditions)
 /******************************************************************************/
 /**
  * @brief               <0x2E service write repair shop code>
- * 
+ *
  * <save RepairShopCode to internal buffer.>
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -473,7 +466,7 @@ uint8 FL_CheckProgPreCondition(uint8 * conditions)
  * @param[in]           <data (IN), length (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_WriteRepairShopCode(const uint8 *data, const uint16 length)
@@ -502,10 +495,10 @@ FL_ResultType FL_WriteRepairShopCode(const uint8 *data, const uint16 length)
         }
     }
 
-	if(data != 0) /* daizhunsheng do */
-	{
-		/* do nothing */
-	}
+    if (data != 0) /* 10086 do */
+    {
+        /* do nothing */
+    }
 
     return ret;
 }
@@ -559,8 +552,8 @@ FL_ResultType FL_WriteFingerPrint(const uint8 *data, const uint16 length)
 /******************************************************************************/
 /**
  * @brief               <0x31 service routine checksum>
- * 
- * <checksum routine for flash driver or logical blocks,only for current 
+ *
+ * <checksum routine for flash driver or logical blocks,only for current
  *  download address> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -568,7 +561,7 @@ FL_ResultType FL_WriteFingerPrint(const uint8 *data, const uint16 length)
  * @param[in]           <checkSum (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_CheckSumRoutine(const uint8 *checkSum)
@@ -607,7 +600,7 @@ FL_ResultType FL_CheckSumRoutine(const uint8 *checkSum)
 /******************************************************************************/
 /**
  * @brief               <0x31 service routine erase>
- * 
+ *
  * <erase routine for  logical block> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -615,7 +608,7 @@ FL_ResultType FL_CheckSumRoutine(const uint8 *checkSum)
  * @param[in]           <blockIndex (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_EraseRoutine(const uint8 index)
@@ -654,8 +647,7 @@ FL_ResultType FL_EraseRoutine(const uint8 index)
         /* check the erase block index and the program attempt */
         if (index < FL_NUM_LOGICAL_BLOCKS)
         {
-            if ((FL_NvmInfo.blockInfo[index].blkProgAttempt < FL_BlkInfo[index].maxProgAttempt)
-             || ((uint16)0x00u == FL_BlkInfo[index].maxProgAttempt))
+            if ((FL_NvmInfo.blockInfo[index].blkProgAttempt < FL_BlkInfo[index].maxProgAttempt) || ((uint16)0x00u == FL_BlkInfo[index].maxProgAttempt))
             {
                 /* set current block is invalid */
                 FL_NvmInfo.blockInfo[index].blkValid = FALSE;
@@ -709,7 +701,7 @@ FL_ResultType FL_EraseRoutine(const uint8 index)
 /******************************************************************************/
 /**
  * @brief               <0x34 service download request>
- * 
+ *
  * <download request for current logical block> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -717,7 +709,7 @@ FL_ResultType FL_EraseRoutine(const uint8 index)
  * @param[in]           <startAdd (IN), length (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_DownloadRequestValid(const uint32 startAdd, const uint32 length)
@@ -736,8 +728,7 @@ FL_ResultType FL_DownloadRequestValid(const uint32 startAdd, const uint32 length
     else
     {
         /* check download step sequence */
-        if ((FldownloadStatus.downloadStep != FL_REQUEST_STEP)
-         && (FldownloadStatus.downloadStep != FL_CHECKSUM_STEP))
+        if ((FldownloadStatus.downloadStep != FL_REQUEST_STEP) && (FldownloadStatus.downloadStep != FL_CHECKSUM_STEP))
         {
             ret = (uint8)FL_ERR_SEQUENCE;
         }
@@ -761,8 +752,7 @@ FL_ResultType FL_DownloadRequestValid(const uint32 startAdd, const uint32 length
         if (FALSE == FldownloadStatus.flDrvDownloaded)
         {
             /* check if download address is in flash driver RAM range */
-            if ((FL_DEV_BASE_ADDRESS == FldownloadStatus.startAddr)
-             && (FldownloadStatus.downLength <= FL_DEV_SIZE))
+            if ((FL_DEV_BASE_ADDRESS == FldownloadStatus.startAddr) && (FldownloadStatus.downLength <= FL_DEV_SIZE))
             {
                 /* set the download step */
                 FldownloadStatus.downloadStep = FL_TRANSFER_STEP;
@@ -815,7 +805,7 @@ FL_ResultType FL_DownloadRequestValid(const uint32 startAdd, const uint32 length
 /******************************************************************************/
 /**
  * @brief               <0x36 service download data>
- * 
+ *
  * <download data for current logical block> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -823,7 +813,7 @@ FL_ResultType FL_DownloadRequestValid(const uint32 startAdd, const uint32 length
  * @param[in]           <destAddr (IN), sourceBuff (IN), length (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
@@ -833,7 +823,7 @@ FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
     FL_ResultType ret = (uint8)FL_OK;
 
     /* change local address to global address */
-    const uint32  globalAddr = destAddr;
+    const uint32 globalAddr = destAddr;
 
     /* check the conditions of the program */
     if (FldownloadStatus.downloadStep != FL_TRANSFER_STEP)
@@ -842,8 +832,7 @@ FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
     }
     else
     {
-        if ((FldownloadStatus.startAddr != globalAddr)
-         || (FldownloadStatus.downLength < length))
+        if ((FldownloadStatus.startAddr != globalAddr) || (FldownloadStatus.downLength < length))
         {
             ret = (uint8)FL_ERR_ADDR_LENGTH;
         }
@@ -859,7 +848,7 @@ FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
         if (FALSE == FldownloadStatus.flDrvDownloaded)
         {
             /* copy the data to the request address */
-            Appl_Memcpy((uint8*)globalAddr, sourceBuff, length);
+            Appl_Memcpy((uint8 *)globalAddr, sourceBuff, length);
 
             /* index start address and length */
             FldownloadStatus.startAddr += length;
@@ -910,7 +899,7 @@ FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
 /******************************************************************************/
 /**
  * @brief               <0x37 service download finish>
- * 
+ *
  * <download finish for current logical block> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -918,7 +907,7 @@ FL_ResultType FL_FlashProgramRegion(const uint32 destAddr,
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType FL_ExitTransferData(void)
@@ -944,7 +933,7 @@ FL_ResultType FL_ExitTransferData(void)
 /******************************************************************************/
 /**
  * @brief               <get service status>
- * 
+ *
  * <supply active job status for service witch can not response with in 50ms,
  *  and send pending> .
  * Service ID   :       <NONE>
@@ -953,7 +942,7 @@ FL_ResultType FL_ExitTransferData(void)
  * @param[in]           <NONE>
  * @param[out]          <error (OUT)>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 boolean FL_ServiceFinished(FL_ResultType *error)
@@ -961,8 +950,7 @@ boolean FL_ServiceFinished(FL_ResultType *error)
     boolean ret = FALSE;
 
     /* check if service is finished */
-    if ((FL_JOB_IDLE == FldownloadStatus.activeJob)
-     && (FldownloadStatus.errorCode != (uint8)FL_UPDATING_NVM))
+    if ((FL_JOB_IDLE == FldownloadStatus.activeJob) && (FldownloadStatus.errorCode != (uint8)FL_UPDATING_NVM))
     {
         *error = FldownloadStatus.errorCode;
         ret = TRUE;
@@ -979,7 +967,7 @@ boolean FL_ServiceFinished(FL_ResultType *error)
 /******************************************************************************/
 /**
  * @brief               <flash main function for active job>
- * 
+ *
  * <flash main function for active job,process checksum,erase and program> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -987,7 +975,7 @@ boolean FL_ServiceFinished(FL_ResultType *error)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void FL_MainFunction(void)
@@ -1031,18 +1019,18 @@ void FL_MainFunction(void)
 /******************************************************************************/
 /**
  * @brief               <program bootloader infomation to EEPROM>
- * 
+ *
  * <program bootloader infomation to EEPROM,e.g. block valid,checksum,
  *  fingerprint..> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_UpdateNvm(void)
 {
-    FL_ResultType     ret = (uint8)FL_FAILED;
+    FL_ResultType ret = (uint8)FL_FAILED;
     /* CRC32 parameter */
     SecM_CRCParamType crcParam;
 
@@ -1066,7 +1054,7 @@ STATIC FL_ResultType FL_UpdateNvm(void)
     flashParamInfo.address = FL_NVM_INFO_ADDRESS;
     flashParamInfo.length = (uint32)sizeof(FL_NvmInfoType);
 
-     /* erase flash block witch store the blocks information */
+    /* erase flash block witch store the blocks information */
     BLFlash_InfoPtr->flashEraseFct(&flashParamInfo);
 
     if ((uint8)kFlashOk == flashParamInfo.errorCode)
@@ -1075,7 +1063,6 @@ STATIC FL_ResultType FL_UpdateNvm(void)
         flashParamInfo.length = (uint32)sizeof(FL_NvmInfoType);
 
         BLFlash_InfoPtr->flashWriteFct(&flashParamInfo);
-
     }
     else
     {
@@ -1084,8 +1071,8 @@ STATIC FL_ResultType FL_UpdateNvm(void)
 
     if ((uint8)kFlashOk == flashParamInfo.errorCode)
     {
-    	/* finger print is not written to NVM*/
-    	FldownloadStatus.fingerPrintWrittenFlag = TRUE;
+        /* finger print is not written to NVM*/
+        FldownloadStatus.fingerPrintWrittenFlag = TRUE;
 
         ret = (uint8)FL_OK;
     }
@@ -1100,18 +1087,18 @@ STATIC FL_ResultType FL_UpdateNvm(void)
 /******************************************************************************/
 /**
  * @brief               <active job erase>
- * 
+ *
  * <erase the current logical block witch requested by 0x31 service> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_Erasing(void)
 {
     FL_ResultType ret = (uint8)FL_OK;
-    tFlashLength  tempLength;
+    tFlashLength tempLength;
     uint8 pendingIndex = 0u;
     /* update the bootloader information to EEPROM */
     ret = FL_UpdateNvm();
@@ -1133,14 +1120,14 @@ STATIC FL_ResultType FL_Erasing(void)
             flashParamInfo.length = 0x30000U;
             BLFlash_InfoPtr->flashEraseFct(&flashParamInfo);
             flashParamInfo.address += flashParamInfo.length;
-			/* force sending pending */
-			Dcm_SendNcr(0x78U);
-			CanTp_MainFunction();
-			CanIf_MainFunction();
+            /* force sending pending */
+            Dcm_SendNcr(0x78U);
+            CanTp_MainFunction();
+            CanIf_MainFunction();
 
             while (((uint8)kFlashOk == flashParamInfo.errorCode) && (tempLength > 0x40000u) && (flashParamInfo.address < 0xA0200000u))
             {
-            	pendingIndex++;
+                pendingIndex++;
                 flashParamInfo.length = 0x40000U;
                 BLFlash_InfoPtr->flashEraseFct(&flashParamInfo);
                 flashParamInfo.address += flashParamInfo.length;
@@ -1148,42 +1135,40 @@ STATIC FL_ResultType FL_Erasing(void)
 
                 if (2u == pendingIndex)
                 {
-                	pendingIndex = 0u;
-        			/* force sending pending */
-        			Dcm_SendNcr(0x78U);
-        			CanTp_MainFunction();
-        			CanIf_MainFunction();
+                    pendingIndex = 0u;
+                    /* force sending pending */
+                    Dcm_SendNcr(0x78U);
+                    CanTp_MainFunction();
+                    CanIf_MainFunction();
                 }
             }
 
             if (flashParamInfo.address >= 0xA0200000u)
             {
-				/* force sending pending */
-				Dcm_SendNcr(0x78U);
-				CanTp_MainFunction();
-				CanIf_MainFunction();
+                /* force sending pending */
+                Dcm_SendNcr(0x78U);
+                CanTp_MainFunction();
+                CanIf_MainFunction();
 
-            	pendingIndex = 0u;
-            	while(((uint8)kFlashOk == flashParamInfo.errorCode) && (tempLength >= 0x40000U))
-            	{
-                	pendingIndex++;
+                pendingIndex = 0u;
+                while (((uint8)kFlashOk == flashParamInfo.errorCode) && (tempLength >= 0x40000U))
+                {
+                    pendingIndex++;
 
                     flashParamInfo.length = 0x40000U;
                     BLFlash_InfoPtr->flashEraseFct(&flashParamInfo);
                     flashParamInfo.address += flashParamInfo.length;
                     tempLength -= 0x40000U;
-                	if(2u == pendingIndex)
-                	{
-                		pendingIndex = 0u;
-        				/* force sending pending */
-        				Dcm_SendNcr(0x78U);
-        				CanTp_MainFunction();
-        				CanIf_MainFunction();
-                	}
-            	}
-
+                    if (2u == pendingIndex)
+                    {
+                        pendingIndex = 0u;
+                        /* force sending pending */
+                        Dcm_SendNcr(0x78U);
+                        CanTp_MainFunction();
+                        CanIf_MainFunction();
+                    }
+                }
             }
-
         }
 
         /* check if erase success */
@@ -1208,20 +1193,20 @@ STATIC FL_ResultType FL_Erasing(void)
 /******************************************************************************/
 /**
  * @brief               <check segment address>
- * 
- * <check if the transfered address is in current block,and if the address is 
+ *
+ * <check if the transfered address is in current block,and if the address is
  *  increased by segment> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_CheckDownloadSegment(void)
 {
-    FL_ResultType        ret = (uint8)FL_OK;
-    FL_SegmentInfoType * curSegment;
-    uint8                segmentIndex;
+    FL_ResultType ret = (uint8)FL_OK;
+    FL_SegmentInfoType *curSegment;
+    uint8 segmentIndex;
 
     /*
      ** check if block is erased, if current num of segment is less than maximum,
@@ -1233,10 +1218,7 @@ STATIC FL_ResultType FL_CheckDownloadSegment(void)
     }
     else
     {
-        if ((FldownloadStatus.segmentList.nrOfSegments < FL_MAX_SEGMENTS)
-         && (FldownloadStatus.startAddr >= FL_BlkInfo[FldownloadStatus.blockIndex].address)
-         && ((FldownloadStatus.startAddr + FldownloadStatus.downLength)
-          <= (FL_BlkInfo[FldownloadStatus.blockIndex].address + FL_BlkInfo[FldownloadStatus.blockIndex].length)))
+        if ((FldownloadStatus.segmentList.nrOfSegments < FL_MAX_SEGMENTS) && (FldownloadStatus.startAddr >= FL_BlkInfo[FldownloadStatus.blockIndex].address) && ((FldownloadStatus.startAddr + FldownloadStatus.downLength) <= (FL_BlkInfo[FldownloadStatus.blockIndex].address + FL_BlkInfo[FldownloadStatus.blockIndex].length)))
         {
             /* get current segment number */
             segmentIndex = FldownloadStatus.segmentList.nrOfSegments;
@@ -1286,13 +1268,13 @@ STATIC FL_ResultType FL_CheckDownloadSegment(void)
 /******************************************************************************/
 /**
  * @brief               <FL_DownloadRemainData>
- * 
- * 
- * 
+ *
+ *
+ *
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_DownloadRemainData(void)
@@ -1338,12 +1320,12 @@ STATIC FL_ResultType FL_DownloadRemainData(void)
 /******************************************************************************/
 /**
  * @brief               <FL_HandleRemainData>
- * 
- * 
- *  
+ *
+ *
+ *
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_HandleRemainData(void)
@@ -1352,8 +1334,7 @@ STATIC FL_ResultType FL_HandleRemainData(void)
 
     if (FL_RemainDataStruct.remainLength != 0UL)
     {
-        if ((FL_RemainDataStruct.remainAddr & ~(FL_PROGRAM_SIZE - (uint32)1))
-         == (FldownloadStatus.startAddr & ~(FL_PROGRAM_SIZE - (uint32)1)))
+        if ((FL_RemainDataStruct.remainAddr & ~(FL_PROGRAM_SIZE - (uint32)1)) == (FldownloadStatus.startAddr & ~(FL_PROGRAM_SIZE - (uint32)1)))
         {
             /*
              *  link the remain data and new segment because one page,
@@ -1385,12 +1366,12 @@ STATIC FL_ResultType FL_HandleRemainData(void)
 /******************************************************************************/
 /**
  * @brief               <program data>
- * 
+ *
  * <program the aligned data transfered by 0x36 service request > .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_ProgrammingData(void)
@@ -1415,8 +1396,7 @@ STATIC FL_ResultType FL_ProgrammingData(void)
             FlProgramLength -= FL_PROGRAM_SIZE - FL_RemainDataStruct.remainLength;
 
             /* set the flash driver input parameter */
-            flashParamInfo.address = FldownloadStatus.startAddr
-                                   - FL_RemainDataStruct.remainLength;
+            flashParamInfo.address = FldownloadStatus.startAddr - FL_RemainDataStruct.remainLength;
             flashParamInfo.length = (uint32)FL_PROGRAM_SIZE;
             flashParamInfo.data = &FlProgramData[0];
 
@@ -1460,12 +1440,12 @@ STATIC FL_ResultType FL_ProgrammingData(void)
 /******************************************************************************/
 /**
  * @brief               <active job program>
- * 
+ *
  * <program the data transfered by 0x36 service request > .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_Programming(void)
@@ -1478,7 +1458,7 @@ STATIC FL_ResultType FL_Programming(void)
     /* check if the last not aligned data should be programmed */
     if ((0UL == FldownloadStatus.downLength) && ((uint8)FL_OK == ret))
     {
-         FldownloadStatus.downloadStep = FL_EXIT_TRANSFER_STEP;
+        FldownloadStatus.downloadStep = FL_EXIT_TRANSFER_STEP;
     }
     else
     {
@@ -1491,21 +1471,21 @@ STATIC FL_ResultType FL_Programming(void)
 /******************************************************************************/
 /**
  * @brief               <fill pad>
- * 
+ *
  * <fill the pad between segments of current block> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 #if (STD_ON == FL_USE_GAP_FILL)
 STATIC FL_ResultType FL_FillGap(void)
 {
     FL_ResultType ret = FL_OK;
-    uint8         segmentIndex = 0;
-    uint32        startAddress = FL_BlkInfo[FldownloadStatus.blockIndex].address;
-    uint32        gapLength;
+    uint8 segmentIndex = 0;
+    uint32 startAddress = FL_BlkInfo[FldownloadStatus.blockIndex].address;
+    uint32 gapLength;
 
     /* set the download data with FL_GAP_FILL_VALUE */
     Appl_Memset((uint8 *)&FlProgramData[0], (uint8)FL_GAP_FILL_VALUE, (uint32)FL_PROGRAM_SIZE);
@@ -1517,13 +1497,11 @@ STATIC FL_ResultType FL_FillGap(void)
         /* find the length of the gap in the segment */
         if (segmentIndex < FldownloadStatus.segmentList.nrOfSegments)
         {
-            gapLength = FldownloadStatus.segmentList.segmentInfo[segmentIndex].address
-                      - startAddress;
+            gapLength = FldownloadStatus.segmentList.segmentInfo[segmentIndex].address - startAddress;
         }
         else
         {
-            gapLength = (FL_BlkInfo[FldownloadStatus.blockIndex].address
-                       + FL_BlkInfo[FldownloadStatus.blockIndex].length) - startAddress;
+            gapLength = (FL_BlkInfo[FldownloadStatus.blockIndex].address + FL_BlkInfo[FldownloadStatus.blockIndex].length) - startAddress;
         }
 
         gapLength &= ~(FL_FLASH_ALIGN_SIZE - 1);
@@ -1563,8 +1541,7 @@ STATIC FL_ResultType FL_FillGap(void)
         if (segmentIndex < FldownloadStatus.segmentList.nrOfSegments)
         {
             /* set the next start address */
-            startAddress = FldownloadStatus.segmentList.segmentInfo[segmentIndex].address
-                         + FldownloadStatus.segmentList.segmentInfo[segmentIndex].length;
+            startAddress = FldownloadStatus.segmentList.segmentInfo[segmentIndex].address + FldownloadStatus.segmentList.segmentInfo[segmentIndex].length;
 
             if ((startAddress & (FL_FLASH_ALIGN_SIZE - 1)) > 0)
             {
@@ -1583,18 +1560,18 @@ STATIC FL_ResultType FL_FillGap(void)
 /******************************************************************************/
 /**
  * @brief               <active job checksum>
- * 
+ *
  * <active checksum that request by 0x31 service> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 STATIC FL_ResultType FL_CheckSuming(void)
 {
-    FL_ResultType        ret = (uint8)FL_OK;
-    SecM_StatusType      secMStatus;
+    FL_ResultType ret = (uint8)FL_OK;
+    SecM_StatusType secMStatus;
     SecM_VerifyParamType verifyParam;
 
     /* set verification API input parameter */
@@ -1714,4 +1691,3 @@ uint16 Fl_GetActiveJob(void)
     return FldownloadStatus.activeJob;
 }
 /*=======[E N D   O F   F I L E]==============================================*/
-

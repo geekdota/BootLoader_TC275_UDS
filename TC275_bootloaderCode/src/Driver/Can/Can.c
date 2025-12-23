@@ -9,14 +9,14 @@
  *
  * <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <jianan.liu>
+ *  @author     <10086>
  *  @date       <03-18-2018>
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /*  <VERSION>    <DATE>    <AUTHOR>    <REVISION LOG>
- *  V1.0.0       20180318  jianan.liu   Initial version
+ *  V1.0.0       20180318  10086   Initial version
  *                                      these features not support in this version:
  *                                      1. multiple Can Drivers.
  *                                      2. Can transceiver.
@@ -34,26 +34,26 @@
 #include "wdtcon.h"
 /*=======[M A C R O S]========================================================*/
 /* Can Hardware Number of Mailboxes */
-#define CAN_HW_MAX_MAILBOXES         64
+#define CAN_HW_MAX_MAILBOXES 64
 
 /* DEM Report function empty */
 #if (STD_OFF == CAN_DEM_ERROR_DETECT)
-#define Dem_ReportErrorStatus(eventId, eventStatus)   do{}while(0)
+#define Dem_ReportErrorStatus(eventId, eventStatus) \
+    do                                              \
+    {                                               \
+    } while (0)
 #endif
 
-
-#define CAN_CNTRL_CFG(controller)         (Can_ControllerConfigData[controller])
-#define CAN_HWOBJ_CFG(mbId)               (Can_HardwareObjectConfigData[mbId])
-#define CAN_HWOBJ_ID(hth)                 (Can_HohConfigData[hth])
-#define CAN_HWOBJ_NUM                     CAN_MAX_HARDWAREOBJECTS
-#define CAN_HOH_NUM                       CAN_MAX_HOHS
-
+#define CAN_CNTRL_CFG(controller) (Can_ControllerConfigData[controller])
+#define CAN_HWOBJ_CFG(mbId) (Can_HardwareObjectConfigData[mbId])
+#define CAN_HWOBJ_ID(hth) (Can_HohConfigData[hth])
+#define CAN_HWOBJ_NUM CAN_MAX_HARDWAREOBJECTS
+#define CAN_HOH_NUM CAN_MAX_HOHS
 
 /* CCU Clock Control Register 1 */
-//#define BL_SCU_CCUCON1               (*((uint32 volatile *) 0xF0036034U))
+// #define BL_SCU_CCUCON1               (*((uint32 volatile *) 0xF0036034U))
 
-
-#define CAN_CNTRL_HOH_NUM(controller)     (uint8)(CAN_CNTRL_CFG(controller).CanRxHwObjCount + CAN_CNTRL_CFG((controller)).CanTxHwObjCount)
+#define CAN_CNTRL_HOH_NUM(controller) (uint8)(CAN_CNTRL_CFG(controller).CanRxHwObjCount + CAN_CNTRL_CFG((controller)).CanTxHwObjCount)
 
 /* MISRA RULE 11.3:303 VIOLATION: Hardware register address operation */
 /* Controller Register */
@@ -66,10 +66,10 @@
 /* SRC Register */
 #define CAN_SRC_REG(controller) ((volatile Can_SrcRegType *)(CAN_SRC_BASE_ADDR - ((controller) * CAN_SRC_ADDR_OFFSET)))
 /* controller PC config */
-#define CAN_CNTRL_PCCFG(controller)  (Can_ControllerPCConfigData[controller])
+#define CAN_CNTRL_PCCFG(controller) (Can_ControllerPCConfigData[controller])
 
 /* hardware object ID to mailbox ID */
-#define CAN_MB_ID(hwObjId)  \
+#define CAN_MB_ID(hwObjId) \
     ((uint8)((hwObjId) - CAN_CNTRL_CFG(CAN_HWOBJ_CFG(hwObjId).CanControllerRef).CanRxHwObjFirst))
 
 /* mailbox ID to hardware object ID */
@@ -92,7 +92,7 @@ typedef enum
 /* Controller Runtime Structure */
 typedef struct
 {
-	/* controller mode */
+    /* controller mode */
     Can_ControllerModeType CntrlMode;
 
     uint32 IntLockCount;
@@ -104,19 +104,14 @@ typedef struct
 
 /*=======[I N T E R N A L   D A T A]==========================================*/
 /* Global Config Pointer */
-STATIC const Can_ConfigType* Can_GlobalConfigPtr;
+STATIC const Can_ConfigType *Can_GlobalConfigPtr;
 
 /* Controller Runtime structure */
 STATIC Can_ControllerStatusType Can_Cntrl[CAN_MAX_CONTROLLERS] =
-{
     {
-        CAN_CS_UNINT,
-        0,
-        {
-            0
-        }
-    }
-};
+        {CAN_CS_UNINT,
+         0,
+         {0}}};
 
 /*=======[I N T E R N A L   F U N C T I O N   D E C L A R A T I O N S]========*/
 /* Mode Control */
@@ -124,7 +119,7 @@ STATIC Can_ReturnType Can_StartMode(uint8 Controller);
 STATIC Can_ReturnType Can_StopMode(uint8 Controller);
 STATIC Can_ReturnType Can_SleepMode(uint8 Controller);
 
-STATIC void Can_InitHwCntrl(uint8 Controller, const Can_ControllerConfigType* Config);
+STATIC void Can_InitHwCntrl(uint8 Controller, const Can_ControllerConfigType *Config);
 STATIC void Can_InitMB(uint8 Controller);
 STATIC void Can_DeInitMB(uint8 Controller);
 
@@ -142,11 +137,11 @@ STATIC uint8 Can_FindLowPriorityMb(uint8 Hth);
 #endif /* STD_ON == CAN_MULTIPLEXED_TRANSMISSION */
 
 STATIC boolean Can_IsTxMbFree(uint8 HwObjId);
-STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType* PduInfo);
+STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType *PduInfo);
 #if ((STD_ON == CAN_HW_TRANSMIT_CANCELLATION) || (STD_ON == CAN_MULTIPLEXED_TRANSMISSION))
 STATIC uint32 Can_GetMBCanId(uint8 HwObjId);
 #endif
-STATIC void Can_GetMBInfo(uint8 HwObjId, Can_PduType* pdu);
+STATIC void Can_GetMBInfo(uint8 HwObjId, Can_PduType *pdu);
 
 #if ((STD_ON == CAN_HW_TRANSMIT_CANCELLATION) || (STD_ON == CAN_MULTIPLEXED_TRANSMISSION))
 STATIC boolean Can_PriorityHigher(Can_IdType destId, Can_IdType srcId);
@@ -178,9 +173,9 @@ STATIC void Can_InitPort(uint8 Controller);
  * CallByAPI           <None>
  */
 /******************************************************************************/
-void Can_Init(const Can_ConfigType* Config)
+void Can_Init(const Can_ConfigType *Config)
 {
-    uint8  controller = 0;
+    uint8 controller = 0;
     uint32 timeOut = 0;
 
     /* backup config pointer */
@@ -194,21 +189,22 @@ void Can_Init(const Can_ConfigType* Config)
     }
 
     /*unlock and then lock, CCUCON1 enable*/
-	unlock_safety_wdtcon();
-	while(0U != (BL_SCU_CCUCON1 >> 31));
-	{   /*Wait till ccucon registers can be written with new value */
-		/*No "timeout" required, because if it hangs, Safety Endinit will give a trap */
-	}
-	BL_SCU_CCUCON1 &= 0xFFFFFFF0U;
-	BL_SCU_CCUCON1 |= 0x50000002U;
-	lock_safety_wdtcon();
+    unlock_safety_wdtcon();
+    while (0U != (BL_SCU_CCUCON1 >> 31))
+        ;
+    { /*Wait till ccucon registers can be written with new value */
+        /*No "timeout" required, because if it hangs, Safety Endinit will give a trap */
+    }
+    BL_SCU_CCUCON1 &= 0xFFFFFFF0U;
+    BL_SCU_CCUCON1 |= 0x50000002U;
+    lock_safety_wdtcon();
 
-     timeOut = CAN_TIMEOUT_DURATION;
+    timeOut = CAN_TIMEOUT_DURATION;
 
-   /*unlock and then lock, Enable Can module reg */
-     unlock_wdtcon();
+    /*unlock and then lock, Enable Can module reg */
+    unlock_wdtcon();
     /* Enable Can module, CAN_CLC->DISR =0 enable the CAN clock, */
-    CAN_CLC_REG = CAN_ENABLE_MODLE;    
+    CAN_CLC_REG = CAN_ENABLE_MODLE;
     /*confirm whether the CAN clock is enable via CAN_CLC_DISS*/
     while ((timeOut > 0UL) && (CAN_DISABLE_STATE == (CAN_CLC_REG & CAN_DISABLE_STATE)))
     {
@@ -234,10 +230,10 @@ void Can_Init(const Can_ConfigType* Config)
         if (0UL == timeOut)
         {
             Dem_ReportErrorStatus(0, 0);
-        }		
-       CAN_MCR_REG = 0x0;
-	/*select fasysn as fcan*/
-       CAN_MCR_REG = 0x1;		
+        }
+        CAN_MCR_REG = 0x0;
+        /*select fasysn as fcan*/
+        CAN_MCR_REG = 0x1;
     }
     return;
 }
@@ -256,18 +252,18 @@ void Can_Init(const Can_ConfigType* Config)
  * CallByAPI           <None>
  */
 /******************************************************************************/
-void Can_InitController(uint8 Controller, const Can_ControllerConfigType* Config)
+void Can_InitController(uint8 Controller, const Can_ControllerConfigType *Config)
 {
     Can_InitHwCntrl(Controller, Config);
 
-    Can_Cntrl[Controller].CntrlMode = CAN_CS_STOPPED;  /* @req <CAN256> */
+    Can_Cntrl[Controller].CntrlMode = CAN_CS_STOPPED; /* @req <CAN256> */
 
     return;
 }
 
 /******************************************************************************/
 /*
- * Brief               <This function performs software triggered state transitions 
+ * Brief               <This function performs software triggered state transitions
  *                         of the CAN controller State machine.>
  * ServiceId           <0x03>
  * Sync/Async          <Asynchronous>
@@ -389,11 +385,11 @@ void Can_EnableControllerInterrupts(uint8 Controller)
  */
 /******************************************************************************/
 /* @req <CAN276> @req <CAN0233> @req <CAN0212> @req <CAN0275> */
-Can_ReturnType Can_Write(uint8 Hth, const Can_PduType* PduInfo)
+Can_ReturnType Can_Write(uint8 Hth, const Can_PduType *PduInfo)
 {
     Can_ReturnType ret = CAN_NOT_OK;
-    uint8          controller;
-    uint8          hwObjId = 0;
+    uint8 controller;
+    uint8 hwObjId = 0;
 
     hwObjId = CAN_HWOBJ_ID(Hth);
     controller = CAN_HWOBJ_CFG(hwObjId).CanControllerRef;
@@ -442,16 +438,16 @@ Can_ReturnType Can_Write(uint8 Hth, const Can_PduType* PduInfo)
 Std_ReturnType Can_Cbk_CheckWakeup(uint8 Controller)
 {
     Std_ReturnType ret = (uint8)E_NOT_OK;
-    if(Controller != 0) /* daizhunsheng add */
+    if (Controller != 0) /* 10086 add */
     {
-    	/* do nothing */
+        /* do nothing */
     }
     return ret;
 }
 
 /******************************************************************************/
 /*
- * Brief               <This function performs the polling of TX confirmation and TX cancellation 
+ * Brief               <This function performs the polling of TX confirmation and TX cancellation
  *                          confirmation when.CAN_TX_PROCESSING is set to POLLING. >
  * ServiceId           <0x01>
  * Param-Name[in]      <None>
@@ -472,8 +468,7 @@ void Can_MainFunction_Write(void)
     for (Controller = 0; Controller < CAN_MAX_CONTROLLERS; Controller++)
     {
         /*@req <CAN178>*/
-        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(Controller).CanTxProcessing)
-         && (CAN_CS_STARTED == Can_Cntrl[Controller].CntrlMode))
+        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(Controller).CanTxProcessing) && (CAN_CS_STARTED == Can_Cntrl[Controller].CntrlMode))
         {
             Can_TxProcess(Controller);
         }
@@ -485,8 +480,8 @@ void Can_MainFunction_Write(void)
 
 /******************************************************************************/
 /*
- * Brief               <This function performs the polling of RX indications when 
- *                          CAN_RX_PROCESSING is set to POLLING.> 
+ * Brief               <This function performs the polling of RX indications when
+ *                          CAN_RX_PROCESSING is set to POLLING.>
  * ServiceId           <0x08>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -496,9 +491,9 @@ void Can_MainFunction_Write(void)
  * CallByAPI           <None>
  */
 /******************************************************************************/
- /*@req <CAN012>
-[heguarantee that neither the ISRs 
- nor the function Can_MainFunction_Read can be interrupted by itself. ]
+/*@req <CAN012>
+[heguarantee that neither the ISRs
+nor the function Can_MainFunction_Read can be interrupted by itself. ]
 */
 /* @req <CAN226> @req <CAN108> @req <CAN180> */
 void Can_MainFunction_Read(void)
@@ -509,8 +504,7 @@ void Can_MainFunction_Read(void)
     /* scan each Controller */
     for (controller = 0; controller < CAN_MAX_CONTROLLERS; controller++)
     {
-        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(controller).CanRxProcessing)
-         && (CAN_CS_STARTED == Can_Cntrl[controller].CntrlMode))
+        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(controller).CanRxProcessing) && (CAN_CS_STARTED == Can_Cntrl[controller].CntrlMode))
         {
             Can_RxProcess(controller);
         }
@@ -523,7 +517,7 @@ void Can_MainFunction_Read(void)
 /******************************************************************************/
 /*
  * Brief               <This function performs the polling of bus-off events that are configured
- *                          statically as "to be polled".> 
+ *                          statically as "to be polled".>
  * ServiceId           <0x09>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -536,13 +530,12 @@ void Can_MainFunction_Read(void)
 void Can_MainFunction_BusOff(void)
 {
 #if (STD_ON == CAN_BUSOFF_POLLING)
-    volatile Can_NodeRegType* canRegs;
-    uint8                     controller;
+    volatile Can_NodeRegType *canRegs;
+    uint8 controller;
 
     for (controller = 0; controller < CAN_MAX_CONTROLLERS; controller++)
     {
-        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(controller).CanBusOffProcessing)
-         && (CAN_CS_STARTED == Can_Cntrl[controller].CntrlMode))
+        if ((CAN_PROCESS_TYPE_POLLING == CAN_CNTRL_PCCFG(controller).CanBusOffProcessing) && (CAN_CS_STARTED == Can_Cntrl[controller].CntrlMode))
         {
             canRegs = CAN_CNTRL_REG(controller);
             if (CAN_ESR_BOFFINT == (CAN_ESR_BOFFINT & canRegs->Nsr))
@@ -559,7 +552,7 @@ void Can_MainFunction_BusOff(void)
 /******************************************************************************/
 /*
  * Brief               <This function performs the polling of wake-up events that are configured
- *                          statically as "to be polled".> 
+ *                          statically as "to be polled".>
  * ServiceId           <0x0a>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -589,14 +582,14 @@ void Can_MainFunction_Wakeup(void)
 /******************************************************************************/
 STATIC void Can_BusOff_Handler(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    Can_ReturnType            ret_val = CAN_NOT_OK;
+    volatile Can_NodeRegType *canRegs;
+    Can_ReturnType ret_val = CAN_NOT_OK;
 
     canRegs = CAN_CNTRL_REG(Controller);
 
     if (CAN_ESR_BOFFINT == (canRegs->Nsr & CAN_ESR_BOFFINT))
     {
-    	ret_val = Can_StopMode(Controller);
+        ret_val = Can_StopMode(Controller);
         if (CAN_OK == ret_val)
         {
             CanIf_ControllerBusOff(Controller);
@@ -625,10 +618,10 @@ STATIC void Can_BusOff_Handler(uint8 Controller)
 /******************************************************************************/
 STATIC void Can_TxProcess(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    volatile Can_MbRegType*   mbRegs;
-    uint8                     hwObjId = 0;
-    uint8                     endHwObjId = 0;
+    volatile Can_NodeRegType *canRegs;
+    volatile Can_MbRegType *mbRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObjId = 0;
 
     canRegs = CAN_CNTRL_REG(Controller);
 
@@ -637,8 +630,7 @@ STATIC void Can_TxProcess(uint8 Controller)
         /* Clear tx successful flag */
         canRegs->Nsr &= ~CAN_TX_OK;
 
-        endHwObjId = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst
-                           + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
+        endHwObjId = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanTxHwObjFirst; hwObjId < endHwObjId; hwObjId++)
         {
@@ -678,13 +670,13 @@ STATIC void Can_TxProcess(uint8 Controller)
 /******************************************************************************/
 STATIC void Can_RxProcess(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    volatile Can_MbRegType*   mbRegs;
-    uint8                     hwObjId = 0;
-    uint8                     endHwObjId = 0;
-    Can_PduType               pdu;
-    uint8                     rxData[EIGHT];
-    /* uint16 					  mbId = 0; *//*daizhunsheng do */
+    volatile Can_NodeRegType *canRegs;
+    volatile Can_MbRegType *mbRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObjId = 0;
+    Can_PduType pdu;
+    uint8 rxData[EIGHT];
+    /* uint16 					  mbId = 0; */ /*10086 do */
 
     canRegs = CAN_CNTRL_REG(Controller);
 
@@ -693,8 +685,7 @@ STATIC void Can_RxProcess(uint8 Controller)
         /* Clear tx successful flag */
         canRegs->Nsr &= ~CAN_RX_OK;
 
-        endHwObjId = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst
-                           + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
+        endHwObjId = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanRxHwObjFirst; hwObjId < endHwObjId; hwObjId++)
         {
@@ -709,40 +700,39 @@ STATIC void Can_RxProcess(uint8 Controller)
                         /* Reset MSGLST bit */
                         mbRegs->Mctstr = CAN_RES_MSGLST_MASK;
                     }
-					/* Get pdu */
-					pdu.sdu = rxData;
-					Can_GetMBInfo(hwObjId, &pdu);
+                    /* Get pdu */
+                    pdu.sdu = rxData;
+                    Can_GetMBInfo(hwObjId, &pdu);
 
-					/* receive 255 after 28 03 */
-					if ((2 == hwObjId) && (1 == FunctService255))
-					{
-						if ((0x214 == pdu.id) && (0x00 == pdu.sdu[0]) && (0xFF == pdu.sdu[1]))
-						{
-						  /* the state of responsing 28 03 */
-						  FunctService255 = 2;
-						}
-					}
-					else if((2 != hwObjId) && (1 != FunctService255))
-					{
-						if ((2 == pdu.sdu[0]) && (0x3EU == pdu.sdu[1]) && (0x80U == pdu.sdu[2]))
-						{
-						  Dcm_StartP3cTimer();
-						}
-						else
-						{
-						  CanIf_RxIndication(CAN_HWOBJ_CFG(hwObjId).CanObjectId, pdu.id, pdu.length, pdu.sdu);
-						}
-					}
-					else
-					{
-						/* clear IFALG */
-
-					}
+                    /* receive 255 after 28 03 */
+                    if ((2 == hwObjId) && (1 == FunctService255))
+                    {
+                        if ((0x214 == pdu.id) && (0x00 == pdu.sdu[0]) && (0xFF == pdu.sdu[1]))
+                        {
+                            /* the state of responsing 28 03 */
+                            FunctService255 = 2;
+                        }
+                    }
+                    else if ((2 != hwObjId) && (1 != FunctService255))
+                    {
+                        if ((2 == pdu.sdu[0]) && (0x3EU == pdu.sdu[1]) && (0x80U == pdu.sdu[2]))
+                        {
+                            Dcm_StartP3cTimer();
+                        }
+                        else
+                        {
+                            CanIf_RxIndication(CAN_HWOBJ_CFG(hwObjId).CanObjectId, pdu.id, pdu.length, pdu.sdu);
+                        }
+                    }
+                    else
+                    {
+                        /* clear IFALG */
+                    }
                     /* Rest NEWDAT bit */
                     mbRegs->Mctstr = CAN_RES_NEWDAT_MASK;
                 }
-		            /* Reset MSGLST bit */
-                mbRegs->Mctstr = CAN_RES_MSGLST_MASK;		
+                /* Reset MSGLST bit */
+                mbRegs->Mctstr = CAN_RES_MSGLST_MASK;
                 /* Reset RXPND bit */
                 mbRegs->Mctstr = CAN_MB_RX_MASK;
             }
@@ -769,7 +759,7 @@ STATIC void Can_RxProcess(uint8 Controller)
 /******************************************************************************/
 STATIC void Can_TxCancel(uint8 HwObjId, uint8 Controller)
 {
-    volatile Can_MbRegType* mbRegs;
+    volatile Can_MbRegType *mbRegs;
     uint8 txData[8];
     Can_PduType pdu;
 
@@ -804,8 +794,8 @@ STATIC void Can_TxCancel(uint8 HwObjId, uint8 Controller)
 /* @req <CAN261> */
 STATIC Can_ReturnType Can_StartMode(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    Can_ReturnType            ret = CAN_NOT_OK;
+    volatile Can_NodeRegType *canRegs;
+    Can_ReturnType ret = CAN_NOT_OK;
 
     if (CAN_CS_STARTED == Can_Cntrl[Controller].CntrlMode)
     {
@@ -848,8 +838,8 @@ STATIC Can_ReturnType Can_StartMode(uint8 Controller)
 /* @req <CAN283> */
 STATIC Can_ReturnType Can_StopMode(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    Can_ReturnType            ret = CAN_NOT_OK;
+    volatile Can_NodeRegType *canRegs;
+    Can_ReturnType ret = CAN_NOT_OK;
 
     if (CAN_CS_STOPPED == Can_Cntrl[Controller].CntrlMode)
     {
@@ -920,9 +910,9 @@ STATIC Can_ReturnType Can_SleepMode(uint8 Controller)
  * CallByAPI           <None>
  */
 /******************************************************************************/
-STATIC void Can_InitHwCntrl(uint8 Controller, const Can_ControllerConfigType* Config)
+STATIC void Can_InitHwCntrl(uint8 Controller, const Can_ControllerConfigType *Config)
 {
-    volatile Can_NodeRegType* canRegs;
+    volatile Can_NodeRegType *canRegs;
 
     canRegs = CAN_CNTRL_REG(Controller);
 
@@ -963,25 +953,22 @@ STATIC void Can_InitHwCntrl(uint8 Controller, const Can_ControllerConfigType* Co
 /******************************************************************************/
 STATIC void Can_InitMB(uint8 Controller)
 {
-    volatile Can_MbRegType* mbRegs;
-    uint8                   hwObjId = 0;
-    uint8                   endHwObj = 0;
-    uint32                  timeOut = 0;
-    uint8                   realController = 0;
-    uint32                  idType = 0;
+    volatile Can_MbRegType *mbRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObj = 0;
+    uint32 timeOut = 0;
+    uint8 realController = 0;
+    uint32 idType = 0;
 
     realController = CAN_CNTRL_PCCFG(Controller).CanControllerRelId;
 
     /* Initialize Receive Hardware Object */
-    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst
-                     + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
+    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
 
     for (hwObjId = CAN_CNTRL_CFG(Controller).CanRxHwObjFirst; hwObjId < endHwObj; hwObjId++)
     {
         /* Allocate MOs for list */
-        CAN_PANCTR_REG = ((uint32)(realController + 1) << 24)
-                      | ((uint32)hwObjId << 16)
-                      | CAN_PANCMD_STATIC_ALLOCATE;
+        CAN_PANCTR_REG = ((uint32)(realController + 1) << 24) | ((uint32)hwObjId << 16) | CAN_PANCMD_STATIC_ALLOCATE;
 
         timeOut = CAN_TIMEOUT_DURATION;
         while ((timeOut > 0UL) && (CAN_PANEL_BUSY == (CAN_PANCTR_REG & CAN_PANEL_BUSY)))
@@ -1012,28 +999,25 @@ STATIC void Can_InitMB(uint8 Controller)
 
         idType = 0x1U & (~(CAN_HWOBJ_CFG(hwObjId).CanIdValue & 0x80000000U) >> 31);
 
-        mbRegs->Moar = (CAN_HWOBJ_CFG(hwObjId).CanIdValue << (18 * idType)) \
-                     | (CAN_MBID_ID_EXTENDED & (~(idType << 29))) | CAN_PRI_CLASS_ID;
+        mbRegs->Moar = (CAN_HWOBJ_CFG(hwObjId).CanIdValue << (18 * idType)) | (CAN_MBID_ID_EXTENDED & (~(idType << 29))) | CAN_PRI_CLASS_ID;
 
-        mbRegs->Moamr = CAN_HWOBJ_CFG(hwObjId).CanFilterMask
-                      | (CAN_ENABLE_MIDE & (~((uint32)CAN_HWOBJ_CFG(hwObjId).CanIdType << 28)));
+        mbRegs->Moamr = CAN_HWOBJ_CFG(hwObjId).CanFilterMask | (CAN_ENABLE_MIDE & (~((uint32)CAN_HWOBJ_CFG(hwObjId).CanIdType << 28)));
 
         /* Set Message Valid */
         mbRegs->Mctstr = CAN_MSG_VALID;
     }
 
     /* Initialize Transmit Hardware Object */
-    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst
-                     + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
+    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
 
-	while(CAN_PANCTR_REG & (0x100 |0x200));
-   
-     /*for(2;3;++)*/
+    while (CAN_PANCTR_REG & (0x100 | 0x200))
+        ;
+
+    /*for(2;3;++)*/
     for (hwObjId = CAN_CNTRL_CFG(Controller).CanTxHwObjFirst; hwObjId < endHwObj; hwObjId++)
     {
         /* Allocate MOs for list */
-        CAN_PANCTR_REG = ((uint32)(realController + 1) << 24)
-                      | ((uint32)hwObjId << 16) | CAN_PANCMD_STATIC_ALLOCATE;
+        CAN_PANCTR_REG = ((uint32)(realController + 1) << 24) | ((uint32)hwObjId << 16) | CAN_PANCMD_STATIC_ALLOCATE;
 
         timeOut = CAN_TIMEOUT_DURATION;
         while ((timeOut > 0UL) && (CAN_PANEL_BUSY == (CAN_PANCTR_REG & CAN_PANEL_BUSY)))
@@ -1068,9 +1052,9 @@ STATIC void Can_InitMB(uint8 Controller)
 
 STATIC void Can_DeInitMB(uint8 Controller)
 {
-    volatile Can_MbRegType* mbRegs;
-    uint8                   hwObjId = 0;
-    uint8                   endHwObj = 0;
+    volatile Can_MbRegType *mbRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObj = 0;
 #if 0 /* daizhumsheng do*/
     uint32                  timeOut = 0;
     uint8                   realController = 0;
@@ -1079,8 +1063,7 @@ STATIC void Can_DeInitMB(uint8 Controller)
     realController = CAN_CNTRL_PCCFG(Controller).CanControllerRelId;
 #endif
     /* Initialize Receive Hardware Object */
-    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst
-                     + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
+    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
 
     for (hwObjId = CAN_CNTRL_CFG(Controller).CanRxHwObjFirst; hwObjId < endHwObj; hwObjId++)
     {
@@ -1094,12 +1077,12 @@ STATIC void Can_DeInitMB(uint8 Controller)
     }
 
     /* Initialize Transmit Hardware Object */
-    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst
-                     + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
+    endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
 
-	while(CAN_PANCTR_REG & (0x100 |0x200));
+    while (CAN_PANCTR_REG & (0x100 | 0x200))
+        ;
 
-     /*for(2;3;++)*/
+    /*for(2;3;++)*/
     for (hwObjId = CAN_CNTRL_CFG(Controller).CanTxHwObjFirst; hwObjId < endHwObj; hwObjId++)
     {
         /* Mb address */
@@ -1110,7 +1093,6 @@ STATIC void Can_DeInitMB(uint8 Controller)
 
         mbRegs->Moar = 0;
     }
-
 }
 
 #if (STD_ON == CAN_MULTIPLEXED_TRANSMISSION)
@@ -1127,14 +1109,14 @@ STATIC void Can_DeInitMB(uint8 Controller)
 /******************************************************************************/
 STATIC uint8 Can_FindLowPriorityMb(uint8 Hth)
 {
-    uint8  hwObjId = 0;
-    uint8  retHwObj = CAN_HWOBJ_ID(Hth);
+    uint8 hwObjId = 0;
+    uint8 retHwObj = CAN_HWOBJ_ID(Hth);
     uint32 CanId = 0;
 
     if (FALSE == Can_IsTxMbFree(retHwObj))
     {
         CanId = Can_GetMBCanId(retHwObj);
-        hwObjId = (uint8)(retHwObj+1);
+        hwObjId = (uint8)(retHwObj + 1);
         while ((hwObjId < CAN_HWOBJ_NUM) && (Hth == CAN_HWOBJ_CFG(hwObjId).CanObjectId))
         {
             if (TRUE == Can_IsTxMbFree(hwObjId))
@@ -1173,8 +1155,8 @@ STATIC uint8 Can_FindLowPriorityMb(uint8 Hth)
 /******************************************************************************/
 STATIC boolean Can_IsTxMbFree(uint8 HwObjId)
 {
-    volatile Can_MbRegType* mbRegs;
-    boolean                 retVal = FALSE;
+    volatile Can_MbRegType *mbRegs;
+    boolean retVal = FALSE;
 
     /* Mb address */
     mbRegs = CAN_MB_REG(HwObjId);
@@ -1199,12 +1181,12 @@ STATIC boolean Can_IsTxMbFree(uint8 HwObjId)
  * CallByAPI           <None>
  */
 /******************************************************************************/
-STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType* PduInfo)
+STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType *PduInfo)
 {
-    volatile Can_MbRegType* mbRegs;
-    uint8                   controller = 0;
-    uint8                   i = 0;
-    uint32                  idType = 0;
+    volatile Can_MbRegType *mbRegs;
+    uint8 controller = 0;
+    uint8 i = 0;
+    uint32 idType = 0;
 
     controller = CAN_HWOBJ_CFG(HwObjId).CanControllerRef;
 
@@ -1217,8 +1199,7 @@ STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType* PduInfo)
     /* Id */
     idType = 0x1U & (~(PduInfo->id & 0x80000000U) >> 31);
 
-    mbRegs->Moar = (PduInfo->id << (18 * idType)) \
-                 | (CAN_MBID_ID_EXTENDED & (~(idType << 29))) | CAN_PRI_CLASS_ID;
+    mbRegs->Moar = (PduInfo->id << (18 * idType)) | (CAN_MBID_ID_EXTENDED & (~(idType << 29))) | CAN_PRI_CLASS_ID;
 
     /* DLC */
     /* Clear DLC */
@@ -1268,8 +1249,8 @@ STATIC void Can_WriteMb(uint8 HwObjId, const Can_PduType* PduInfo)
 /******************************************************************************/
 STATIC uint32 Can_GetMBCanId(uint8 HwObjId)
 {
-    volatile Can_MbRegType* mbRegs;
-    uint32                  canId = 0;
+    volatile Can_MbRegType *mbRegs;
+    uint32 canId = 0;
 
     /* Mb address */
     mbRegs = CAN_MB_REG(HwObjId);
@@ -1278,7 +1259,7 @@ STATIC uint32 Can_GetMBCanId(uint8 HwObjId)
     if (CAN_MBID_ID_EXTENDED == (mbRegs->Moar & CAN_MBID_ID_EXTENDED))
     {
         canId = mbRegs->Moar & (~CAN_MBID_ID_EXTENDED) & (~CAN_PRI_CLASS_ID);
-        canId |= 0x80000000U;  /* CanIf need extended Canid set 31 bit */
+        canId |= 0x80000000U; /* CanIf need extended Canid set 31 bit */
     }
     /* standard frame */
     else
@@ -1300,19 +1281,19 @@ STATIC uint32 Can_GetMBCanId(uint8 HwObjId)
  * CallByAPI           <None>
  */
 /******************************************************************************/
-STATIC void Can_GetMBInfo(uint8 HwObjId, Can_PduType* pdu)
+STATIC void Can_GetMBInfo(uint8 HwObjId, Can_PduType *pdu)
 {
-    volatile Can_MbRegType* mbRegs;
-    uint8                   i = 0;
+    volatile Can_MbRegType *mbRegs;
+    uint8 i = 0;
 
     /* Mb address */
     mbRegs = CAN_MB_REG(HwObjId);
 
     /* ID */
-    if ((mbRegs->Moar & CAN_IDE) != 0)  /* extended frame */
+    if ((mbRegs->Moar & CAN_IDE) != 0) /* extended frame */
     {
         pdu->id = mbRegs->Moar & (~CAN_MBID_ID_EXTENDED) & (~CAN_PRI_CLASS_ID);
-        pdu->id |= 0x80000000U;   /* CanIf need extended Canid set 31 bit */
+        pdu->id |= 0x80000000U; /* CanIf need extended Canid set 31 bit */
     }
     else /* standard frame */
     {
@@ -1345,7 +1326,7 @@ STATIC void Can_GetMBInfo(uint8 HwObjId, Can_PduType* pdu)
  * Brief               <compare two canid priority>
  * Param-Name[in]      <destId - destination Can ID>
  * Param-Name[in]      <srcId  - source Can ID>
- * Return              <TRUE: destId higher than srcId, 
+ * Return              <TRUE: destId higher than srcId,
  *                      FALSE: destId not higher than srcId>
  * PreCondition        <None>
  * CallByAPI           <None>
@@ -1396,12 +1377,12 @@ STATIC boolean Can_PriorityHigher(Can_IdType destId, Can_IdType srcId)
 /******************************************************************************/
 STATIC void Can_StartStateEnableInt(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    volatile Can_MbRegType*   mbRegs;
-    volatile Can_SrcRegType*  srcRegs;
-    uint8                     hwObjId = 0;
-    uint8                     endHwObj = 0;
-    uint8                     realController = 0;
+    volatile Can_NodeRegType *canRegs;
+    volatile Can_MbRegType *mbRegs;
+    volatile Can_SrcRegType *srcRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObj = 0;
+    uint8 realController = 0;
 
     realController = CAN_CNTRL_PCCFG(Controller).CanControllerRelId;
     canRegs = CAN_CNTRL_REG(Controller);
@@ -1413,8 +1394,7 @@ STATIC void Can_StartStateEnableInt(uint8 Controller)
         srcRegs->RXI = 0x1000U | ((uint32)realController + (uint32)0x4U);
         canRegs->Ncr |= 0x2U;
         /* Enable mb interrupt */
-        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst
-                         + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
+        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanRxHwObjFirst; hwObjId < endHwObj; hwObjId++)
         {
@@ -1430,8 +1410,7 @@ STATIC void Can_StartStateEnableInt(uint8 Controller)
     {
         srcRegs->TXI = 0x1000U | ((uint32)realController + (uint32)0x7U);
         canRegs->Ncr |= 0x2U;
-        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst
-                         + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
+        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanTxHwObjFirst; hwObjId < endHwObj; hwObjId++)
         {
@@ -1465,18 +1444,17 @@ STATIC void Can_StartStateEnableInt(uint8 Controller)
 /******************************************************************************/
 STATIC void Can_DisableInt(uint8 Controller)
 {
-    volatile Can_NodeRegType* canRegs;
-    volatile Can_MbRegType*   mbRegs;
-    uint8                     hwObjId = 0;
-    uint8                     endHwObj = 0;
+    volatile Can_NodeRegType *canRegs;
+    volatile Can_MbRegType *mbRegs;
+    uint8 hwObjId = 0;
+    uint8 endHwObj = 0;
 
     canRegs = CAN_CNTRL_REG(Controller);
 
     if (CAN_PROCESS_TYPE_INTERRUPT == CAN_CNTRL_PCCFG(Controller).CanRxProcessing)
     {
         /* Enable mb interrupt */
-        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst
-                         + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
+        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanRxHwObjFirst + CAN_CNTRL_CFG(Controller).CanRxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanRxHwObjFirst; hwObjId < endHwObj; hwObjId++)
         {
@@ -1490,8 +1468,7 @@ STATIC void Can_DisableInt(uint8 Controller)
 
     if (CAN_PROCESS_TYPE_INTERRUPT == CAN_CNTRL_PCCFG(Controller).CanTxProcessing)
     {
-        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst
-                         + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
+        endHwObj = (uint8)(CAN_CNTRL_CFG(Controller).CanTxHwObjFirst + CAN_CNTRL_CFG(Controller).CanTxHwObjCount);
 
         for (hwObjId = CAN_CNTRL_CFG(Controller).CanTxHwObjFirst; hwObjId < endHwObj; hwObjId++)
         {
@@ -1542,7 +1519,7 @@ STATIC void Can_ResetPnd(uint8 HwObjId)
     case CAN_MSPND2:
         if (CAN_MSPND2 != 0)
         {
-            CAN_MSPND_2 =~(uint32)(0x1U << (HwObjId - 64));
+            CAN_MSPND_2 = ~(uint32)(0x1U << (HwObjId - 64));
         }
         break;
 
@@ -1606,13 +1583,13 @@ STATIC void Can_InitPort(uint8 Controller)
     switch (realController)
     {
     case 0:
-        P20_IOCR4 = (P20_IOCR4 & ~0xF8000000U) | 0x20000000U;    /*P20.7 RX*/
-        P20_IOCR8 = (P20_IOCR8 & ~0xF8U) | 0xA8U;   /*P20.8 TX*/
+        P20_IOCR4 = (P20_IOCR4 & ~0xF8000000U) | 0x20000000U; /*P20.7 RX*/
+        P20_IOCR8 = (P20_IOCR8 & ~0xF8U) | 0xA8U;             /*P20.8 TX*/
         break;
 
     case 1:
-    	P14_IOCR0 = (P14_IOCR0 & ~0xF800U) | 0x2000U;  /*P14.1 RX*/
-    	P14_IOCR0 = (P14_IOCR0 & ~0xF8U) | 0xA8U; /*P14.0 TX*/
+        P14_IOCR0 = (P14_IOCR0 & ~0xF800U) | 0x2000U; /*P14.1 RX*/
+        P14_IOCR0 = (P14_IOCR0 & ~0xF8U) | 0xA8U;     /*P14.0 TX*/
         break;
 
     case 2:
@@ -1638,11 +1615,11 @@ STATIC void Can_InitPort(uint8 Controller)
 /******************************************************************************/
 void Can_Deinit(void)
 {
-    volatile Can_NodeRegType* canRegs;
-    uint8                     i = 0;
+    volatile Can_NodeRegType *canRegs;
+    uint8 i = 0;
 
     /* Access to Endinit-protected registers is permitted */
-    unlock_wdtcon();	
+    unlock_wdtcon();
     CAN_MSPND_0 = 0;
     CAN_MSPND_1 = 0;
     CAN_MSPND_2 = 0;
@@ -1651,7 +1628,7 @@ void Can_Deinit(void)
 
     for (i = 0; i < CAN_MAX_CONTROLLERS; i++)
     {
-    	Can_DeInitMB(i);
+        Can_DeInitMB(i);
         canRegs = CAN_CNTRL_REG(i);
         canRegs->Ncr = CAN_NODE_DISABLE;
         canRegs->Nipr = 0;
@@ -1669,4 +1646,3 @@ void Can_Deinit(void)
 }
 
 /*=======[E N D   O F   F I L E]==============================================*/
-

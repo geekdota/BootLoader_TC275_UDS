@@ -1,24 +1,24 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  * @file 	CanIf.c
  * @brief
  *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- * @author 	WBN
+ * @author 	10086
  * @date 	2013-5-22
- * 
+ *
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *    V1.0    20130522   WBN        Initial version
- *    V1.1    20180511   CChen      update
+ *    V1.0    20130522   10086        Initial version
+ *    V1.1    20180511   10086      update
  */
 /*============================================================================*/
 
@@ -37,12 +37,12 @@ extern const CanIf_RxChannelType CanIfRxCh[CANIF_RX_CHANNEL_NUM];
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      None      
+ * Param-Name[in]      None
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              None  
- * PreCondition        None  
- * CallByAPI           CanIf_Init 
+ * Return              None
+ * PreCondition        None
+ * CallByAPI           CanIf_Init
  */
 /******************************************************************************/
 void CanIf_Init(void)
@@ -58,21 +58,21 @@ void CanIf_Init(void)
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      Id, *PduInfoPtr      
+ * Param-Name[in]      Id, *PduInfoPtr
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              Std_ReturnType  
- * PreCondition        None  
- * CallByAPI           CanIf_Transmit 
+ * Return              Std_ReturnType
+ * PreCondition        None
+ * CallByAPI           CanIf_Transmit
  */
 /******************************************************************************/
-Std_ReturnType CanIf_Transmit(PduIdType Id, const PduInfoType* PduInfoPtr)
+Std_ReturnType CanIf_Transmit(PduIdType Id, const PduInfoType *PduInfoPtr)
 {
-    const CanIf_TxChannelType* pCh = CanIfTxCh;     /* point to canif transmit configuration */
-    Can_ReturnType             canRes = CAN_NOT_OK; /* result of can write */
-    uint8                      iloop;               /* loop counter */
-    Can_PduType                canPdu;              /* store transmit message */
-    Std_ReturnType             res = (uint8)E_OK;   /* return result */
+    const CanIf_TxChannelType *pCh = CanIfTxCh; /* point to canif transmit configuration */
+    Can_ReturnType canRes = CAN_NOT_OK;         /* result of can write */
+    uint8 iloop;                                /* loop counter */
+    Can_PduType canPdu;                         /* store transmit message */
+    Std_ReturnType res = (uint8)E_OK;           /* return result */
 
     for (iloop = (uint8)0; iloop < (uint8)CANIF_TX_CHANNEL_NUM; iloop++)
     {
@@ -110,18 +110,18 @@ Std_ReturnType CanIf_Transmit(PduIdType Id, const PduInfoType* PduInfoPtr)
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      CanTxPduId      
+ * Param-Name[in]      CanTxPduId
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              None  
- * PreCondition        None  
- * CallByAPI           CanIf_TxConfirmation 
+ * Return              None
+ * PreCondition        None
+ * CallByAPI           CanIf_TxConfirmation
  */
 /******************************************************************************/
 void CanIf_TxConfirmation(PduIdType CanTxPduId)
 {
-    const CanIf_TxChannelType* pCh = CanIfTxCh; /* point to canif configuration */
-    uint8                      iloop;           /* loop counter */
+    const CanIf_TxChannelType *pCh = CanIfTxCh; /* point to canif configuration */
+    uint8 iloop;                                /* loop counter */
 
     for (iloop = (uint8)0; iloop < (uint8)CANIF_TX_CHANNEL_NUM; iloop++)
     {
@@ -145,19 +145,19 @@ void CanIf_TxConfirmation(PduIdType CanTxPduId)
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      Hrh, CanId, CanDlc, *CanSduPtr      
+ * Param-Name[in]      Hrh, CanId, CanDlc, *CanSduPtr
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              None  
- * PreCondition        None  
- * CallByAPI           CanIf_RxIndication 
+ * Return              None
+ * PreCondition        None
+ * CallByAPI           CanIf_RxIndication
  */
 /******************************************************************************/
 void CanIf_RxIndication(uint8 Hrh, Can_IdType CanId, uint8 CanDlc, uint8 *CanSduPtr)
 {
-    const CanIf_RxChannelType* pCh = CanIfRxCh; /* point to can if rx configuration */
-    uint8                      iloop;           /* loop counter */
-    PduInfoType                PduInfo;         /* store received message */
+    const CanIf_RxChannelType *pCh = CanIfRxCh; /* point to can if rx configuration */
+    uint8 iloop;                                /* loop counter */
+    PduInfoType PduInfo;                        /* store received message */
 
     for (iloop = (uint8)0; iloop < (uint8)CANIF_RX_CHANNEL_NUM; iloop++)
     {
@@ -183,22 +183,22 @@ void CanIf_RxIndication(uint8 Hrh, Can_IdType CanId, uint8 CanDlc, uint8 *CanSdu
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      Controller      
+ * Param-Name[in]      Controller
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              None  
- * PreCondition        None  
- * CallByAPI           CanIf_ControllerBusOff 
+ * Return              None
+ * PreCondition        None
+ * CallByAPI           CanIf_ControllerBusOff
  */
 /******************************************************************************/
 void CanIf_ControllerBusOff(uint8 Controller)
 {
     /* empty */
-	if(Controller != 0) /* daizhunsheng do */
-	{
-		/* do nothing */
-	}
-	return;
+    if (Controller != 0) /* 10086 do */
+    {
+        /* do nothing */
+    }
+    return;
 }
 
 /******************************************************************************/
@@ -207,12 +207,12 @@ void CanIf_ControllerBusOff(uint8 Controller)
  * ServiceId           None
  * Sync/Async          Synchronous
  * Reentrancy          Non Reentrant
- * Param-Name[in]      None      
+ * Param-Name[in]      None
  * Param-Name[out]     None
  * Param-Name[in/out]  None
- * Return              None  
- * PreCondition        None  
- * CallByAPI           CanIf_MainFunction 
+ * Return              None
+ * PreCondition        None
+ * CallByAPI           CanIf_MainFunction
  */
 /******************************************************************************/
 void CanIf_MainFunction(void)

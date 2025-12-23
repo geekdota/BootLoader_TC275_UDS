@@ -1,16 +1,16 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <FL.h>
  *  @brief      <Macros,Types defines and function declarations for Flash Driver
  *              Module>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <cywang>
+ *  @author     <10086>
  *  @date       <2016-10-25>
  */
 /*============================================================================*/
@@ -19,11 +19,11 @@
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *     V1.0   20121227   Gary       Initial version
+ *     V1.0   20121227   10086       Initial version
  *
- *     V1.1   20160801   cywang        update
+ *     V1.1   20160801   10086        update
  *
- *     V1.2   20180511   CChen         update
+ *     V1.2   20180511   10086         update
  */
 /*============================================================================*/
 
@@ -33,23 +33,23 @@
 
 /*=======[M A C R O S]========================================================*/
 /* FL module execute result */
-#define FL_OK               0x00U
-#define FL_FAILED           0x01U
-#define FL_ERR_SEQUENCE     0x02U
-#define FL_NO_FINGERPRINT   0x03U
-#define FL_NO_FLASHDRIVER   0x04U
-#define FL_ERR_ADDR_LENGTH  0x05U
-#define FL_INVALID_DATA     0x06U
-#define FL_UPDATING_NVM     0x07U
+#define FL_OK 0x00U
+#define FL_FAILED 0x01U
+#define FL_ERR_SEQUENCE 0x02U
+#define FL_NO_FINGERPRINT 0x03U
+#define FL_NO_FLASHDRIVER 0x04U
+#define FL_ERR_ADDR_LENGTH 0x05U
+#define FL_INVALID_DATA 0x06U
+#define FL_UPDATING_NVM 0x07U
 
 /** Value indicate an external programming request. */
-#define FL_EXT_PROG_REQUEST_RECEIVED    0x5AA5A55AU
+#define FL_EXT_PROG_REQUEST_RECEIVED 0x5AA5A55AU
 
 /** Value indicate an update of the application software. */
 #define FL_APPL_UPDATED 0xA55A5AA5u
 
 /** Value indicate default session request from prog. of the bootloader software. */
-#define FL_BOOT_DEFAULT_FROM_PROG       0xA55AAAAAU
+#define FL_BOOT_DEFAULT_FROM_PROG 0xA55AAAAAU
 
 /*=======[T Y P E   D E F I N I T I O N S]====================================*/
 /** Standard return type for call back routines. */
@@ -101,7 +101,7 @@ typedef struct
     uint8 blkProgCounter;
 
     uint8 reserved;
-	
+
     uint8 fingerPrint[FL_FINGER_PRINT_LENGTH];
 
     uint32 blkChecksum;
@@ -145,13 +145,13 @@ extern uint16 FL_ReadProgAttemptCounter(uint8 *readData);
 
 extern uint16 FL_ReadBootSWReferenceNumber(uint8 *readData);
 
-extern uint16 FL_ReadFingerPrint(uint8 *readData);   
+extern uint16 FL_ReadFingerPrint(uint8 *readData);
 
 extern uint16 FL_ReadSysECUHWVer(uint8 *readData);
 
-extern uint32 FL_ReadMemory(uint32 address, uint32 length, uint8* data);
+extern uint32 FL_ReadMemory(uint32 address, uint32 length, uint8 *data);
 
-extern uint8 FL_CheckProgPreCondition(uint8 * conditions);
+extern uint8 FL_CheckProgPreCondition(uint8 *conditions);
 
 extern FL_ResultType FL_WriteRepairShopCode(const uint8 *data, const uint16 length);
 
@@ -176,6 +176,6 @@ extern void FL_MainFunction(void);
 
 extern void FL_updateProgCnt(void);
 
-#endif/* endof FL_H */
+#endif /* endof FL_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/

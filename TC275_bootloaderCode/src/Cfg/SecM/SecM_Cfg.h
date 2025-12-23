@@ -1,17 +1,17 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
- *  
+ *
+ *
  *  @file       <SecM_Cfg.h>
  *  @brief      <Config File for Security Module >
- *              Config the SECM_ECU_KEY 
- *  
+ *              Config the SECM_ECU_KEY
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <Gary Chen>
+ *  @author     <10086>
  *  @date       <2012-11-09>
  */
 /*============================================================================*/
@@ -31,14 +31,14 @@
 /*=======[M A C R O S]========================================================*/
 
 /*  CRC method */
-#define CAL_CRC16     0x00u
-#define CAL_CRC32     0x01u
-#define CAL_METHOD    CAL_CRC32
+#define CAL_CRC16 0x00u
+#define CAL_CRC32 0x01u
+#define CAL_METHOD CAL_CRC32
 
 /** value k for security access */
 /* @type:uint32 range:0x00000000~0xFFFFFFFF note:NONE */
-#define SECM_ECU_KEY  0x8704162BU
+#define SECM_ECU_KEY 0x8704162BU
 
-#endif/* endof SECM_CFG_H */
+#endif /* endof SECM_CFG_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/

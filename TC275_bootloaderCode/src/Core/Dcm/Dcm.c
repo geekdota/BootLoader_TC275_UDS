@@ -1,31 +1,31 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2017, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <Dcm.c>
  *  @brief      <UDS Service - ISO14229>
- *  
+ *
  *  <This Diagnostic Communication Manager file contained UDS services
  *   which used for bootloader project>
  *
  *  <Compiler: HighTec4.6    MCU:TC27x>
- * 
- *  @author     <ccl>
+ *
+ *  @author     <10086>
  *  @date       <2013-09-13>
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *    V1.0    20121109   Gary       Initial version
+ *    V1.0    20121109   10086       Initial version
  *
- *    V1.1    20130913   ccl        update
+ *    V1.1    20130913   10086        update
  *
- *    V1.2    20160801  cywang      update
+ *    V1.2    20160801  10086      update
  *
- *    V1.3    20180511  CChen       update
+ *    V1.3    20180511  10086       update
  */
 /*============================================================================*/
 
@@ -42,12 +42,12 @@ typedef struct
 {
     /* DCM main rx buffer */
     Dcm_BuffType rxBuff;
-    
+
     /* DCM main tx buffer */
     Dcm_BuffType txBuff;
 
     /* DCM current service */
-    const Dcm_ServiceTableType * curServicePtr;
+    const Dcm_ServiceTableType *curServicePtr;
 
     /* if there is a new service request is not processed */
     boolean reqNew;
@@ -73,10 +73,10 @@ typedef struct
 
     /* ECU reset Timer */
     uint16 resetTimer;
-    
+
     /* if security access is unlocked */
     Dcm_SecurityType securityLevel;
-    
+
     /* DCM security access timer */
     uint32 securityTimer;
 
@@ -115,7 +115,7 @@ STATIC void Dcm_TimerProc(void);
 /******************************************************************************/
 /**
  * @brief               <DCM module initialize>
- * 
+ *
  * <DCM module initialize> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -123,14 +123,14 @@ STATIC void Dcm_TimerProc(void);
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_Init(void)
 {
     /* set session to default session */
     Dcm_SetSessionMode(DCM_SESSION_DEFAULT);
-    
+
     /* reset to security access level */
     Dcm_SetSecurityLevel(DCM_SECURITY_LOCKED);
 
@@ -139,23 +139,23 @@ void Dcm_Init(void)
 
     /* stop ECU reset timer */
     Dcm_StopResetTimer();
-    
+
     /* reset service process */
     Dcm_ServiceFinish();
 
     /* initialize DSP */
     Dcm_DspInit();
-    
+
     return;
 }
 
 /******************************************************************************/
 /**
  * @brief               <DCM module program initialize>
- * 
+ *
  * <when program boot request is equal to FL_EXT_PROG_REQUEST_RECEIVED,
- *  this API will be called in Appl_FlStartup function, session is initialized 
- *  to programming session,and simulate an 10 03 session control service is 
+ *  this API will be called in Appl_FlStartup function, session is initialized
+ *  to programming session,and simulate an 10 03 session control service is
  *  received> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -163,7 +163,7 @@ void Dcm_Init(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_ProgramInit(Dcm_SessionType targetSession)
@@ -208,7 +208,7 @@ void Dcm_ProgramInit(Dcm_SessionType targetSession)
 /******************************************************************************/
 /**
  * @brief               <DCM main task function>
- * 
+ *
  * <DCM main task function> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -216,14 +216,14 @@ void Dcm_ProgramInit(Dcm_SessionType targetSession)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_MainFunction(void)
 {
     /* process P2C, P3C, security timer */
     Dcm_TimerProc();
-    
+
     /* process service */
     Dcm_ServiceProcess();
 
@@ -233,7 +233,7 @@ void Dcm_MainFunction(void)
 /******************************************************************************/
 /**
  * @brief               <DCM provide rx buffer for CanTp>
- * 
+ *
  * <DCM provide rx buffer for CanTp,mean an request is receiving> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -241,7 +241,7 @@ void Dcm_MainFunction(void)
  * @param[in]           <pduId (IN), pduLen (IN)>
  * @param[out]          <sduInfo (OUT)>
  * @param[in/out]       <NONE>
- * @return              <CanTp_BufReq_RetType>    
+ * @return              <CanTp_BufReq_RetType>
  */
 /******************************************************************************/
 BufReq_ReturnType Dcm_ProvideRxBuffer(PduIdType pduId,
@@ -251,8 +251,7 @@ BufReq_ReturnType Dcm_ProvideRxBuffer(PduIdType pduId,
     BufReq_ReturnType ret = BUFREQ_OK;
 
     /* Rx buffer is free state and pduid is correct */
-    if ((DCM_BUFF_FREE == dcmComStatus.rxBuff.buffStatus)
-     && (((uint16)DCM_RX_PHY_PDU_ID == pduId) || ((uint16)DCM_RX_FUNC_PDU_ID == pduId)))
+    if ((DCM_BUFF_FREE == dcmComStatus.rxBuff.buffStatus) && (((uint16)DCM_RX_PHY_PDU_ID == pduId) || ((uint16)DCM_RX_FUNC_PDU_ID == pduId)))
     {
         /* Main Buffer should be free */
         if (pduLen <= (uint16)DCM_RX_BUF_SIZE)
@@ -281,7 +280,7 @@ BufReq_ReturnType Dcm_ProvideRxBuffer(PduIdType pduId,
 /******************************************************************************/
 /**
  * @brief               <DCM rx indication from CanTp>
- * 
+ *
  * <DCM rx indication from CanTp,mean an request is received> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -289,7 +288,7 @@ BufReq_ReturnType Dcm_ProvideRxBuffer(PduIdType pduId,
  * @param[in]           <pduId (IN), result (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_RxIndication(PduIdType pduId, NotifResultType result)
@@ -320,7 +319,7 @@ void Dcm_RxIndication(PduIdType pduId, NotifResultType result)
 /******************************************************************************/
 /**
  * @brief               <DCM provide tx buffer for CanTp>
- * 
+ *
  * <DCM provide rx buffer for CanTp,mean a response is sending> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -328,7 +327,7 @@ void Dcm_RxIndication(PduIdType pduId, NotifResultType result)
  * @param[in]           <pduId (IN)>
  * @param[out]          <sduInfo (OUT)>
  * @param[in/out]       <NONE>
- * @return              <CanTp_BufReq_RetType>    
+ * @return              <CanTp_BufReq_RetType>
  */
 /******************************************************************************/
 BufReq_ReturnType Dcm_ProvideTxBuffer(PduIdType pduId, PduInfoType **sduInfo)
@@ -336,8 +335,7 @@ BufReq_ReturnType Dcm_ProvideTxBuffer(PduIdType pduId, PduInfoType **sduInfo)
     BufReq_ReturnType ret = BUFREQ_OK;
 
     /* check if Tx Buffer is provide for service process */
-    if ((DCM_BUFF_FOR_SERVICE == dcmComStatus.txBuff.buffStatus)
-     && (pduId == dcmComStatus.txBuff.pduId))
+    if ((DCM_BUFF_FOR_SERVICE == dcmComStatus.txBuff.buffStatus) && (pduId == dcmComStatus.txBuff.pduId))
     {
         /* send MainTXBuff */
         *sduInfo = &dcmComStatus.txBuff.pduInfo;
@@ -355,7 +353,7 @@ BufReq_ReturnType Dcm_ProvideTxBuffer(PduIdType pduId, PduInfoType **sduInfo)
 /******************************************************************************/
 /**
  * @brief               <DCM tx confirmation from CanTp>
- * 
+ *
  * <DCM rx indication from CanTp,mean a response is sended> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -363,17 +361,15 @@ BufReq_ReturnType Dcm_ProvideTxBuffer(PduIdType pduId, PduInfoType **sduInfo)
  * @param[in]           <pduId (IN), result (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_TxConfirmation(PduIdType pduId, NotifResultType result)
 {
-    uint8* pduData;
+    uint8 *pduData;
 
     /* service response finished */
-    if (((uint8)NTFRSLT_OK == result)
-     && (pduId == dcmComStatus.txBuff.pduId)
-     && (FALSE == dcmComStatus.respFinished))
+    if (((uint8)NTFRSLT_OK == result) && (pduId == dcmComStatus.txBuff.pduId) && (FALSE == dcmComStatus.respFinished))
     {
         /*
          ** this case is only appear when send pending message and service is
@@ -404,7 +400,7 @@ void Dcm_TxConfirmation(PduIdType pduId, NotifResultType result)
 /******************************************************************************/
 /**
  * @brief               <set service process finish>
- * 
+ *
  * <set service process finish> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -412,7 +408,7 @@ void Dcm_TxConfirmation(PduIdType pduId, NotifResultType result)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_ServiceFinish(void)
@@ -455,7 +451,7 @@ void Dcm_ServiceFinish(void)
 /******************************************************************************/
 /**
  * @brief               <clear rx buffer>
- * 
+ *
  * <clear rx buffer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -463,7 +459,7 @@ void Dcm_ServiceFinish(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_ClearRxBuff(const PduLengthType clearLength)
@@ -481,7 +477,7 @@ STATIC void Dcm_ClearRxBuff(const PduLengthType clearLength)
 /******************************************************************************/
 /**
  * @brief               <set session mode>
- * 
+ *
  * <set session mode> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -489,7 +485,7 @@ STATIC void Dcm_ClearRxBuff(const PduLengthType clearLength)
  * @param[in]           <sessMode (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_SetSessionMode(const Dcm_SessionType sessMode)
@@ -503,7 +499,7 @@ void Dcm_SetSessionMode(const Dcm_SessionType sessMode)
 /******************************************************************************/
 /**
  * @brief               <get session mode>
- * 
+ *
  * <get session mode> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -511,7 +507,7 @@ void Dcm_SetSessionMode(const Dcm_SessionType sessMode)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 Dcm_SessionType Dcm_GetSessionMode(void)
@@ -523,7 +519,7 @@ Dcm_SessionType Dcm_GetSessionMode(void)
 /******************************************************************************/
 /**
  * @brief               <check if session mode is support>
- * 
+ *
  * <check if session mode is support> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -531,7 +527,7 @@ Dcm_SessionType Dcm_GetSessionMode(void)
  * @param[in]           <sessionTable (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 boolean Dcm_CheckSessionSupp(const Dcm_SessionType sessionSupportMask)
@@ -550,21 +546,19 @@ boolean Dcm_CheckSessionSupp(const Dcm_SessionType sessionSupportMask)
     return ret;
 }
 
-
 boolean Dcm_CheckSessionSuppMask(const Dcm_SessionType sessionSupportMask)
 {
     boolean ret = TRUE;
 
     if ((uint8)3 != (uint8)(dcmRunTime.curSession & sessionSupportMask))
     {
-          Dcm_SendNcr(DCM_E_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION);
-          ret = FALSE;
+        Dcm_SendNcr(DCM_E_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION);
+        ret = FALSE;
     }
     else
     {
         /* empty */
     }
-
 
     return ret;
 }
@@ -575,14 +569,13 @@ boolean Dcm_CheckSessionSuppMask_2E(const Dcm_SessionType sessionSupportMask)
 
     if ((uint8)2 != (uint8)(dcmRunTime.curSession & sessionSupportMask))
     {
-          Dcm_SendNcr(DCM_E_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION);
-          ret = FALSE;
+        Dcm_SendNcr(DCM_E_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION);
+        ret = FALSE;
     }
     else
     {
         /* empty */
     }
-
 
     return ret;
 }
@@ -590,7 +583,7 @@ boolean Dcm_CheckSessionSuppMask_2E(const Dcm_SessionType sessionSupportMask)
 /******************************************************************************/
 /**
  * @brief               <set security level>
- * 
+ *
  * <set security level> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -598,7 +591,7 @@ boolean Dcm_CheckSessionSuppMask_2E(const Dcm_SessionType sessionSupportMask)
  * @param[in]           <secLev (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_SetSecurityLevel(const Dcm_SecurityType secLev)
@@ -612,7 +605,7 @@ void Dcm_SetSecurityLevel(const Dcm_SecurityType secLev)
 /******************************************************************************/
 /**
  * @brief               <get security level>
- * 
+ *
  * <get security level> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -620,7 +613,7 @@ void Dcm_SetSecurityLevel(const Dcm_SecurityType secLev)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <Dcm_SecurityType>    
+ * @return              <Dcm_SecurityType>
  */
 /******************************************************************************/
 Dcm_SecurityType Dcm_GetSecurityLevel(void)
@@ -632,7 +625,7 @@ Dcm_SecurityType Dcm_GetSecurityLevel(void)
 /******************************************************************************/
 /**
  * @brief               <check if security timer is expired>
- * 
+ *
  * <check if security timer is expired> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -640,7 +633,7 @@ Dcm_SecurityType Dcm_GetSecurityLevel(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 boolean Dcm_GetSecurityTimerExpired(void)
@@ -656,14 +649,14 @@ boolean Dcm_GetSecurityTimerExpired(void)
     {
         /* empty */
     }
-#endif //180904
+#endif // 180904
     return ret;
 }
 
 /******************************************************************************/
 /**
  * @brief               <check if security level if supportted>
- * 
+ *
  * <check if security level if supportted> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -671,7 +664,7 @@ boolean Dcm_GetSecurityTimerExpired(void)
  * @param[in]           <secLevTable (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 boolean Dcm_CheckSecuritySupp(const Dcm_SecurityType securitySupportMask)
@@ -693,7 +686,7 @@ boolean Dcm_CheckSecuritySupp(const Dcm_SecurityType securitySupportMask)
 /******************************************************************************/
 /**
  * @brief               <start security timer>
- * 
+ *
  * <start security timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -701,7 +694,7 @@ boolean Dcm_CheckSecuritySupp(const Dcm_SecurityType securitySupportMask)
  * @param[in]           <timeOut (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_StartSecurityTimer(uint32 timeOut)
@@ -715,7 +708,7 @@ void Dcm_StartSecurityTimer(uint32 timeOut)
 /******************************************************************************/
 /**
  * @brief               <start reset timer>
- * 
+ *
  * <start reset timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -723,7 +716,7 @@ void Dcm_StartSecurityTimer(uint32 timeOut)
  * @param[in]           <timeOut (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_StartResetTimer(uint16 timeOut)
@@ -737,7 +730,7 @@ void Dcm_StartResetTimer(uint16 timeOut)
 /******************************************************************************/
 /**
  * @brief               <send response>
- * 
+ *
  * <send response> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -745,7 +738,7 @@ void Dcm_StartResetTimer(uint16 timeOut)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_SendRsp(void)
@@ -764,7 +757,7 @@ void Dcm_SendRsp(void)
 /******************************************************************************/
 /**
  * @brief               <transmit negative response>
- * 
+ *
  * <transmit negative response> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -772,12 +765,12 @@ void Dcm_SendRsp(void)
  * @param[in]           <nrcCode (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_SendNcr(uint8 nrcCode)
 {
-    uint8* const pduData = &(dcmComStatus.txBuff.pduInfo.SduDataPtr[0]);
+    uint8 *const pduData = &(dcmComStatus.txBuff.pduInfo.SduDataPtr[0]);
 
     /* check if send pending */
     if (nrcCode != (uint8)DCM_E_PENDING)
@@ -813,7 +806,7 @@ void Dcm_SendNcr(uint8 nrcCode)
 /******************************************************************************/
 /**
  * @brief               <start service process when received message>
- * 
+ *
  * <start service process when received message> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -821,7 +814,7 @@ void Dcm_SendNcr(uint8 nrcCode)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_ServiceStart(void)
@@ -846,7 +839,7 @@ STATIC void Dcm_ServiceStart(void)
 /******************************************************************************/
 /**
  * @brief               <handle requested service>
- * 
+ *
  * <handle requested service> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -854,14 +847,14 @@ STATIC void Dcm_ServiceStart(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 uint8 TestFlag = FALSE;
 STATIC void Dcm_ServiceHandle(void)
 {
     boolean SIDFind = FALSE;
-    uint8   tableIndex = (uint8)DCM_SERVICE_NUM;
+    uint8 tableIndex = (uint8)DCM_SERVICE_NUM;
     boolean sesSupp;
 
     /* record current service table */
@@ -870,16 +863,15 @@ STATIC void Dcm_ServiceHandle(void)
     /* find service table */
     while ((tableIndex > (uint8)0) && (FALSE == SIDFind))
     {
-    	if ((uint16)DCM_RX_FUNC_PDU_ID == dcmComStatus.rxBuff.pduId)
-    	{
-    		TestFlag =TRUE;
-    	}
+        if ((uint16)DCM_RX_FUNC_PDU_ID == dcmComStatus.rxBuff.pduId)
+        {
+            TestFlag = TRUE;
+        }
 
         tableIndex--;
         if (dcmComStatus.curServicePtr->SID == dcmComStatus.rxBuff.pduInfo.SduDataPtr[0])
         {
-            if (((uint16)DCM_RX_PHY_PDU_ID == dcmComStatus.rxBuff.pduId)
-             && ((dcmComStatus.curServicePtr->addressSupportMask & (uint8)DCM_PHYSICAL_ADDRESSING) != (uint8)0))
+            if (((uint16)DCM_RX_PHY_PDU_ID == dcmComStatus.rxBuff.pduId) && ((dcmComStatus.curServicePtr->addressSupportMask & (uint8)DCM_PHYSICAL_ADDRESSING) != (uint8)0))
             {
                 SIDFind = TRUE;
             }
@@ -887,8 +879,7 @@ STATIC void Dcm_ServiceHandle(void)
             {
                 /* empty */
             }
-            if (((uint16)DCM_RX_FUNC_PDU_ID == dcmComStatus.rxBuff.pduId)
-             && ((dcmComStatus.curServicePtr->addressSupportMask & (uint8)DCM_FUNCTIONAL_ADDRESSING) != (uint8)0))
+            if (((uint16)DCM_RX_FUNC_PDU_ID == dcmComStatus.rxBuff.pduId) && ((dcmComStatus.curServicePtr->addressSupportMask & (uint8)DCM_FUNCTIONAL_ADDRESSING) != (uint8)0))
             {
                 SIDFind = TRUE;
             }
@@ -919,17 +910,14 @@ STATIC void Dcm_ServiceHandle(void)
         if (TRUE == sesSupp)
         {
 
-
             /* execute service process */
             dcmComStatus.curServicePtr->serviceFct(&dcmComStatus.rxBuff,
                                                    &dcmComStatus.txBuff);
-
         }
         else
         {
             /* service is not supported in active session */
             Dcm_SendNcr(DCM_E_SERVICE_NOT_SUPPORTED_IN_ACTIVE_SESSION);
-
         }
     }
     else
@@ -940,7 +928,6 @@ STATIC void Dcm_ServiceHandle(void)
             /* if received PDU ID is function address, reset service process */
             Dcm_ServiceFinish();
         }
-
 
         else
         {
@@ -955,7 +942,7 @@ STATIC void Dcm_ServiceHandle(void)
 /******************************************************************************/
 /**
  * @brief               <process new requested service>
- * 
+ *
  * <process new requested service> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -963,13 +950,13 @@ STATIC void Dcm_ServiceHandle(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_ServiceProcess(void)
 {
     FL_ResultType errorCode;
-    boolean       serviceFinished;
+    boolean serviceFinished;
 
     /* check if tx buffer is free */
     if (DCM_BUFF_FREE == dcmComStatus.txBuff.buffStatus)
@@ -989,8 +976,7 @@ STATIC void Dcm_ServiceProcess(void)
                 serviceFinished = FL_ServiceFinished(&errorCode);
 
                 /* check if service busy is finished, then can send response. */
-                if ((TRUE == serviceFinished)
-                 && (dcmComStatus.curServicePtr->pendingFct != NULL_PTR))
+                if ((TRUE == serviceFinished) && (dcmComStatus.curServicePtr->pendingFct != NULL_PTR))
                 {
                     dcmComStatus.curServicePtr->pendingFct(errorCode,
                                                            &dcmComStatus.rxBuff,
@@ -1018,7 +1004,7 @@ STATIC void Dcm_ServiceProcess(void)
 /******************************************************************************/
 /**
  * @brief               <start P3C timer by config value>
- * 
+ *
  * <start P3C timer by config value> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1026,7 +1012,7 @@ STATIC void Dcm_ServiceProcess(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_StartP3cTimer(void)
@@ -1039,7 +1025,7 @@ void Dcm_StartP3cTimer(void)
 /******************************************************************************/
 /**
  * @brief               <stop P3C timer>
- * 
+ *
  * <stop P3C timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1047,7 +1033,7 @@ void Dcm_StartP3cTimer(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_StopP3cTimer(void)
@@ -1060,7 +1046,7 @@ STATIC void Dcm_StopP3cTimer(void)
 /******************************************************************************/
 /**
  * @brief               <process P3C timer>
- * 
+ *
  * <process P3C timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1068,7 +1054,7 @@ STATIC void Dcm_StopP3cTimer(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_P3cTimerCheck(void)
@@ -1098,7 +1084,7 @@ STATIC void Dcm_P3cTimerCheck(void)
 /******************************************************************************/
 /**
  * @brief               <start P2E timer by given value>
- * 
+ *
  * <start P2E timer by given value> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1106,7 +1092,7 @@ STATIC void Dcm_P3cTimerCheck(void)
  * @param[in]           <timeout (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_StartP2eTimer(const uint16 timeout)
@@ -1119,7 +1105,7 @@ STATIC void Dcm_StartP2eTimer(const uint16 timeout)
 /******************************************************************************/
 /**
  * @brief               <stop P2E timer>
- * 
+ *
  * <stop P2E timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1127,7 +1113,7 @@ STATIC void Dcm_StartP2eTimer(const uint16 timeout)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_StopP2eTimer(void)
@@ -1140,7 +1126,7 @@ STATIC void Dcm_StopP2eTimer(void)
 /******************************************************************************/
 /**
  * @brief               <process P2E timer>
- * 
+ *
  * <process P2E timer,and send pending> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1148,7 +1134,7 @@ STATIC void Dcm_StopP2eTimer(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_P2eTimerCheck(void)
@@ -1164,31 +1150,31 @@ STATIC void Dcm_P2eTimerCheck(void)
             if (DCM_BUFF_FREE == dcmComStatus.txBuff.buffStatus)
             {
 
-				if ((1 == FunctService255) || (2 == FunctService255))
-				{
-					if (dcmComStatus.pendingCount < 5)
-					{
-						Dcm_SendNcr(DCM_E_PENDING);
-					}
-					else
-					{
-						Dcm_SendNcr(DCM_E_GENERAL_REJECT);
-					}
-				}
-				else
-				{
-					if (dcmComStatus.pendingCount < (uint16)DCM_PENDING_ATTEMPT_NUM)
-					{
-						if(1 != Fl_GetActiveJob())
-						{
-							Dcm_SendNcr(DCM_E_PENDING);
-						}
-					}
-					else
-					{
-						Dcm_SendNcr(DCM_E_GENERAL_REJECT);
-					}
-				}
+                if ((1 == FunctService255) || (2 == FunctService255))
+                {
+                    if (dcmComStatus.pendingCount < 5)
+                    {
+                        Dcm_SendNcr(DCM_E_PENDING);
+                    }
+                    else
+                    {
+                        Dcm_SendNcr(DCM_E_GENERAL_REJECT);
+                    }
+                }
+                else
+                {
+                    if (dcmComStatus.pendingCount < (uint16)DCM_PENDING_ATTEMPT_NUM)
+                    {
+                        if (1 != Fl_GetActiveJob())
+                        {
+                            Dcm_SendNcr(DCM_E_PENDING);
+                        }
+                    }
+                    else
+                    {
+                        Dcm_SendNcr(DCM_E_GENERAL_REJECT);
+                    }
+                }
             }
             else
             {
@@ -1211,7 +1197,7 @@ STATIC void Dcm_P2eTimerCheck(void)
 /******************************************************************************/
 /**
  * @brief               <transmit response>
- * 
+ *
  * <transmit response, but not include pending> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1219,7 +1205,7 @@ STATIC void Dcm_P2eTimerCheck(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_StartTransmit(void)
@@ -1239,7 +1225,7 @@ STATIC void Dcm_StartTransmit(void)
 /******************************************************************************/
 /**
  * @brief               <process security timer>
- * 
+ *
  * <process security timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1247,7 +1233,7 @@ STATIC void Dcm_StartTransmit(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_SecurityTimerCheck(void)
@@ -1267,7 +1253,7 @@ STATIC void Dcm_SecurityTimerCheck(void)
 /******************************************************************************/
 /**
  * @brief               <stop reset timer>
- * 
+ *
  * <stop reset timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1275,7 +1261,7 @@ STATIC void Dcm_SecurityTimerCheck(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_StopResetTimer(void)
@@ -1289,7 +1275,7 @@ STATIC void Dcm_StopResetTimer(void)
 /******************************************************************************/
 /**
  * @brief               <process reset timer>
- * 
+ *
  * <process reset timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1297,7 +1283,7 @@ STATIC void Dcm_StopResetTimer(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_ResetTimerCheck(void)
@@ -1328,7 +1314,7 @@ STATIC void Dcm_ResetTimerCheck(void)
 /******************************************************************************/
 /**
  * @brief               <process session timer P2E,P3C,reset ,security timer>
- * 
+ *
  * <process session timer P2E,P3C,reset,security timer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1336,7 +1322,7 @@ STATIC void Dcm_ResetTimerCheck(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Dcm_TimerProc(void)
@@ -1363,7 +1349,7 @@ void Dcm_ForcePending(void)
 
 void PosResponse255(void)
 {
-    uint8* pduData = (uint8*)&dcmComStatus.txBuff.pduInfo.SduDataPtr[0];
+    uint8 *pduData = (uint8 *)&dcmComStatus.txBuff.pduInfo.SduDataPtr[0];
 
     pduData[0] = 0x68u;
     pduData[1] = 0x03u;

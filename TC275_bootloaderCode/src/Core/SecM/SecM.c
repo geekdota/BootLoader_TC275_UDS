@@ -1,14 +1,14 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <SecM.c>
  *  @brief      <Security set>
- *  
+ *
  *              <seed and key generate for UDS>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
  *  @author     <ccl>
@@ -47,7 +47,7 @@ STATIC SecM_StatusType SecM_ProcessCrc(SecM_CRCParamType *crcParam,
 /******************************************************************************/
 /**
  * @brief               <generate seed for UDS>
- * 
+ *
  * <Needed by the UDS module,generate seed> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -55,7 +55,7 @@ STATIC SecM_StatusType SecM_ProcessCrc(SecM_CRCParamType *crcParam,
  * @param[in]           <NONE>
  * @param[out]          <seed (OUT)>
  * @param[in/out]       <NONE>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 SecM_StatusType SecM_GenerateSeed(SecM_SeedType *seed)
@@ -81,7 +81,7 @@ SecM_StatusType SecM_GenerateSeed(SecM_SeedType *seed)
 /******************************************************************************/
 /**
  * @brief               <compute key>
- * 
+ *
  * <compute key before compute key> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -89,7 +89,7 @@ SecM_StatusType SecM_GenerateSeed(SecM_SeedType *seed)
  * @param[in]           <seed (IN), k (IN)>
  * @param[out]          <key (OUT)>
  * @param[in/out]       <NONE>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 SecM_StatusType SecM_ComputeKey(SecM_SeedType seed,
@@ -118,7 +118,7 @@ SecM_StatusType SecM_ComputeKey(SecM_SeedType seed,
 /******************************************************************************/
 /**
  * @brief               <compare key>
- * 
+ *
  * <Needed by the UDS module,compare seed> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -126,19 +126,19 @@ SecM_StatusType SecM_ComputeKey(SecM_SeedType seed,
  * @param[in]           <key (IN), seed (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 SecM_StatusType SecM_CompareKey(SecM_KeyType key, SecM_SeedType seed)
 {
     SecM_StatusType ret = SECM_OK;
-    SecM_KeyType    getkey;
+    SecM_KeyType getkey;
 
     ret = SecM_ComputeKey(seed, SECM_ECU_KEY, &getkey);
 
     if (getkey != key)
     {
-        //ret = SECM_NOT_OK; /*daizhunsheng mask SeedKey veritfy function*/
+        // ret = SECM_NOT_OK; /*10086 mask SeedKey veritfy function*/
     }
     else
     {
@@ -151,7 +151,7 @@ SecM_StatusType SecM_CompareKey(SecM_KeyType key, SecM_SeedType seed)
 /******************************************************************************/
 /**
  * @brief               <compute CRC>
- * 
+ *
  * <process CRC compute,include init,compute and finish> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -159,7 +159,7 @@ SecM_StatusType SecM_CompareKey(SecM_KeyType key, SecM_SeedType seed)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <crcParam (IN/OUT)>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 SecM_StatusType SecM_ComputeCRC(SecM_CRCParamType *crcParam)
@@ -196,7 +196,7 @@ SecM_StatusType SecM_ComputeCRC(SecM_CRCParamType *crcParam)
 /******************************************************************************/
 /**
  * @brief               <verificate CRC value>
- * 
+ *
  * <verificate if transfered CRC is equal to computed CRC> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -204,15 +204,15 @@ SecM_StatusType SecM_ComputeCRC(SecM_CRCParamType *crcParam)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <verifyParam (IN/OUT)>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 SecM_StatusType SecM_Verification(SecM_VerifyParamType *verifyParam)
 {
-    SecM_StatusType   ret = SECM_OK;
+    SecM_StatusType ret = SECM_OK;
     SecM_CRCParamType crcParam;
-    uint8             segmentIndex = (uint8)0;
-    SecM_CRCType      transferedCrc;
+    uint8 segmentIndex = (uint8)0;
+    SecM_CRCType transferedCrc;
 
     if (NULL_PTR == verifyParam->segmentList)
     {
@@ -265,7 +265,7 @@ SecM_StatusType SecM_Verification(SecM_VerifyParamType *verifyParam)
         /* compare CRC */
         if (transferedCrc != crcParam.currentCRC)
         {
-            //ret = SECM_NOT_OK; /* daizhunsheng do */
+            // ret = SECM_NOT_OK; /* 10086 do */
         }
         else
         {
@@ -286,19 +286,19 @@ SecM_StatusType SecM_Verification(SecM_VerifyParamType *verifyParam)
 /******************************************************************************/
 /**
  * @brief               <process CRC compute>
- * 
+ *
  * <CRC compute> .
  * @param[in]           <Address (IN), Length (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <crcParam (IN/OUT)>
- * @return              <SecM_StatusType>    
+ * @return              <SecM_StatusType>
  */
 /******************************************************************************/
 STATIC SecM_StatusType SecM_ProcessCrc(SecM_CRCParamType *crcParam,
                                        uint32 Address, uint32 Length)
 {
     SecM_StatusType ret = SECM_OK;
-    uint32          readLength = 0UL;
+    uint32 readLength = 0UL;
 
     /* set CRC compute step */
     crcParam->crcState = (uint8)SECM_CRC_COMPUTE;

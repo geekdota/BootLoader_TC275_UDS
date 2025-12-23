@@ -1,29 +1,29 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <Dcm_Dsp.c>
  *  @brief      <UDS Service - ISO14229>
- *  
+ *
  *  <This Diagnostic Communication Manager file contained UDS services
  *   which used for bootloader project>
  *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <cyWang>
+ *  @author     <10086>
  *  @date       <2016-10-25>
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *    V1.0    20121109   Gary       Initial version
+ *    V1.0    20121109   10086       Initial version
  *
- *    V1.1    20160801  cywang      update
+ *    V1.1    20160801  10086      update
  *
- *    V1.2    20180511  CChen       update
+ *    V1.2    20180511  10086       update
  */
 /*============================================================================*/
 
@@ -38,7 +38,10 @@
 #include "Dcm.h"
 /*=======[T Y P E   D E F I N I T I O N S]====================================*/
 
-#define WunusedParameter(a) if(a != 0){/* do mothing */} /* daizhunsheng do */
+#define WunusedParameter(a) \
+    if (a != 0)             \
+    { /* do mothing */      \
+    } /* 10086 do */
 /* data structure for program */
 typedef struct
 {
@@ -56,8 +59,8 @@ typedef struct
 /* data structure for security access */
 typedef struct
 {
- /* DCM security access attempt num counter */
-    uint8 attempt;     
+    /* DCM security access attempt num counter */
+    uint8 attempt;
     /* if seed has requested */
     boolean seedReq;
 
@@ -77,14 +80,14 @@ STATIC SecM_SeedType dcmLastSeed = 0UL;
 
 /*=======[I N T E R N A L   F U N C T I O N   D E C L A R A T I O N S]========*/
 STATIC uint32 Dcm_ConvertAddress(uint32 address);
-STATIC uint32 Dcm_Get4Byte(const uint8* data);
-STATIC void Dcm_Set4Byte(uint8* destData, const uint32 sourceData);
+STATIC uint32 Dcm_Get4Byte(const uint8 *data);
+STATIC void Dcm_Set4Byte(uint8 *destData, const uint32 sourceData);
 
 STATIC boolean Dcm_CheckSubFuncSession(const Dcm_SessionType sessionSupportMask);
 STATIC boolean Dcm_CheckRoutineIDSession(const Dcm_SessionType sessionSupportMask);
 STATIC boolean Dcm_CheckMsgLength(const uint16 standardlength, const uint16 receivedLength);
 STATIC boolean Dcm_CheckSecurityCondition(const Dcm_SecurityType securitySupportMask);
-STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxBuff);
+STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType *rxBuff);
 
 STATIC boolean Dcm_SessionChangeConditionCheck(Dcm_SessionType sessionValue);
 STATIC boolean Dcm_ConditionCheck(void);
@@ -93,19 +96,19 @@ STATIC boolean Dcm_CheckReqOutOfRange(const boolean find);
 STATIC boolean Dcm_HighVoltageCheck(void);
 STATIC boolean Dcm_LowVoltageCheck(void);
 
-STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType * secTablePtr,
-                            const Dcm_BuffType * rxBuff,
-                            Dcm_BuffType * txBuff);
-STATIC void Dcm_SendKey(const Dcm_SecurityRowType * secTablePtr,
-                        const Dcm_BuffType * rxBuff,
-                        Dcm_BuffType * txBuff);
+STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType *secTablePtr,
+                            const Dcm_BuffType *rxBuff,
+                            Dcm_BuffType *txBuff);
+STATIC void Dcm_SendKey(const Dcm_SecurityRowType *secTablePtr,
+                        const Dcm_BuffType *rxBuff,
+                        Dcm_BuffType *txBuff);
 
 /*=======[F U N C T I O N   I M P L E M E N T A T I O N S]====================*/
 
 /******************************************************************************/
 /**
  * @brief               <DCM module dsp initialize>
- * 
+ *
  * <DCM module dsp initialize> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -113,7 +116,7 @@ STATIC void Dcm_SendKey(const Dcm_SecurityRowType * secTablePtr,
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_DspInit(void)
@@ -128,7 +131,7 @@ void Dcm_DspInit(void)
     dcmDspProgram.address = 0UL;
 
     /* clear security access attempt num */
-    dcmDspSec.attempt = 0x00u;    
+    dcmDspSec.attempt = 0x00u;
 
     /* set seed has not requested */
     dcmDspSec.seedReq = FALSE;
@@ -139,7 +142,7 @@ void Dcm_DspInit(void)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x10 session control>
- * 
+ *
  * <handle service 0x10 session control> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -147,21 +150,21 @@ void Dcm_DspInit(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg10(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg10(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-    boolean                    positiveRspReq = TRUE;
+    boolean positiveRspReq = TRUE;
 #endif
-    Dcm_SessionType            sessionValue = (uint8)0x00u;
-    uint8                      sessionTableIndex = (uint8)DCM_SESSION_NUM;
-    const Dcm_SessionRowType * sessionTablePtr = Dcm_SessionRow;
-    boolean                    sessionFind = FALSE;
-    boolean                    processContinue = TRUE;
-    Dcm_SessionType            curSession;
-    uint8                      subFunc;
+    Dcm_SessionType sessionValue = (uint8)0x00u;
+    uint8 sessionTableIndex = (uint8)DCM_SESSION_NUM;
+    const Dcm_SessionRowType *sessionTablePtr = Dcm_SessionRow;
+    boolean sessionFind = FALSE;
+    boolean processContinue = TRUE;
+    Dcm_SessionType curSession;
+    uint8 subFunc;
 
     /*
      * convert subFunc to session mask value
@@ -170,11 +173,10 @@ void Dcm_RecvMsg10(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
      * extend session: 0x03->0x04
      */
     uint8 const sessionConvertTable[DCM_SESSION_SUPPORT_NUM] =
-    {
-        (uint8)DCM_SESSION_DEFAULT,
-        (uint8)DCM_SESSION_PROGRAMMING,
-        (uint8)DCM_SESSION_EXTEND
-    };
+        {
+            (uint8)DCM_SESSION_DEFAULT,
+            (uint8)DCM_SESSION_PROGRAMMING,
+            (uint8)DCM_SESSION_EXTEND};
 
     /* check if received message length is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength(0x02u, rxBuff->pduInfo.SduLength);
@@ -239,9 +241,9 @@ void Dcm_RecvMsg10(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         if (((uint8)DCM_SESSION_PROGRAMMING == sessionValue) && ((uint16)DCM_RX_FUNC_PDU_ID == rxBuff->pduId))
         {
-        	/* subfunction is not supportted */
-            Dcm_SendNcr(DCM_E_SUBFUNC_NOT_SUPPORTED);   
-        	Dcm_ServiceFinish();
+            /* subfunction is not supportted */
+            Dcm_SendNcr(DCM_E_SUBFUNC_NOT_SUPPORTED);
+            Dcm_ServiceFinish();
             processContinue = FALSE;
         }
         else
@@ -254,42 +256,40 @@ void Dcm_RecvMsg10(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         /* empty */
     }
 
-
-
-    if (TRUE == processContinue){
-      /* get current security level */
-      curSession = Dcm_GetSessionMode();
-      /* SESSION_DEFAULT is not supported to SESSION_PROGRAMMING*/
-  	  if (((uint8)DCM_SESSION_DEFAULT == curSession) && ((uint8)DCM_SESSION_PROGRAMMING == sessionValue))
-      {
-              /* session change condition is not correct */
-              Dcm_SendNcr(DCM_E_SUBFUNCTION_NOT_SUPPORT_IN_ACTIVE_SESSION);
-              processContinue = FALSE;
-      }
-  	     /* SESSION_PROGRAMMING is not supported to SESSION_EXTEND*/
-  	  else if(((uint8)DCM_SESSION_PROGRAMMING == curSession) && ((uint8)DCM_SESSION_EXTEND == sessionValue))
-  	  {
-  	          /* session change condition is not correct */
-              Dcm_SendNcr(DCM_E_SUBFUNCTION_NOT_SUPPORT_IN_ACTIVE_SESSION);
-              processContinue = FALSE;
-  	  }
-  	  else
-  	  {
-  	       /* empty */
-  	  }
-  }
-  else
-  {
-  	    /* empty */
-  }
-
+    if (TRUE == processContinue)
+    {
+        /* get current security level */
+        curSession = Dcm_GetSessionMode();
+        /* SESSION_DEFAULT is not supported to SESSION_PROGRAMMING*/
+        if (((uint8)DCM_SESSION_DEFAULT == curSession) && ((uint8)DCM_SESSION_PROGRAMMING == sessionValue))
+        {
+            /* session change condition is not correct */
+            Dcm_SendNcr(DCM_E_SUBFUNCTION_NOT_SUPPORT_IN_ACTIVE_SESSION);
+            processContinue = FALSE;
+        }
+        /* SESSION_PROGRAMMING is not supported to SESSION_EXTEND*/
+        else if (((uint8)DCM_SESSION_PROGRAMMING == curSession) && ((uint8)DCM_SESSION_EXTEND == sessionValue))
+        {
+            /* session change condition is not correct */
+            Dcm_SendNcr(DCM_E_SUBFUNCTION_NOT_SUPPORT_IN_ACTIVE_SESSION);
+            processContinue = FALSE;
+        }
+        else
+        {
+            /* empty */
+        }
+    }
+    else
+    {
+        /* empty */
+    }
 
 #if (STD_ON == DCM_SID_NRC_SUPPORT)
-if (TRUE == processContinue)
-{
-    /* check if subfunciton is supportted in current security level, other wise send NRC */
-    processContinue = Dcm_CheckSecurityCondition(sessionTablePtr->securitySupportMask);
-}
+    if (TRUE == processContinue)
+    {
+        /* check if subfunciton is supportted in current security level, other wise send NRC */
+        processContinue = Dcm_CheckSecurityCondition(sessionTablePtr->securitySupportMask);
+    }
 #endif
 
     if (TRUE == processContinue)
@@ -305,7 +305,7 @@ if (TRUE == processContinue)
     if (TRUE == processContinue)
     {
         /* get current security level */
-    	curSession = Dcm_GetSessionMode();
+        curSession = Dcm_GetSessionMode();
 
         if (sessionValue != (uint8)DCM_SESSION_DEFAULT)
         {
@@ -320,13 +320,8 @@ if (TRUE == processContinue)
             /* empty */
         }
 
-
-
-
         /* if from non default session to default session, then not change, but reset */
-        if ((((uint8)DCM_SESSION_PROGRAMMING == curSession) || ((uint8)DCM_SESSION_EXTEND == curSession))
-            && ((uint8)DCM_SESSION_DEFAULT == sessionValue)
-            && (FALSE == dcmDummyDefault))
+        if ((((uint8)DCM_SESSION_PROGRAMMING == curSession) || ((uint8)DCM_SESSION_EXTEND == curSession)) && ((uint8)DCM_SESSION_DEFAULT == sessionValue) && (FALSE == dcmDummyDefault))
         {
             *(uint32 *)FL_BOOT_DEFAULT = (uint32)FL_BOOT_DEFAULT_FROM_PROG;
             /* force sending pending */
@@ -345,15 +340,15 @@ if (TRUE == processContinue)
             if (TRUE == positiveRspReq)
             {
 #endif
-            /* set response message */
-            txBuff->pduInfo.SduDataPtr[0] = (uint8)0x50u;
-            txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
-            txBuff->pduInfo.SduDataPtr[2] = (uint8)(((uint16)DCM_P2MAX_TIME)>> 0x08u);
-            txBuff->pduInfo.SduDataPtr[3] = (uint8)DCM_P2MAX_TIME;
-            txBuff->pduInfo.SduDataPtr[4] = (uint8)(((uint16)DCM_P2SMAX_TIME / (uint8)10) >> (uint8)0x08u);
-            txBuff->pduInfo.SduDataPtr[5] = (uint8)(DCM_P2SMAX_TIME / 10);
-            txBuff->pduInfo.SduLength = (uint8)0x06u;
-            Dcm_SendRsp();
+                /* set response message */
+                txBuff->pduInfo.SduDataPtr[0] = (uint8)0x50u;
+                txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
+                txBuff->pduInfo.SduDataPtr[2] = (uint8)(((uint16)DCM_P2MAX_TIME) >> 0x08u);
+                txBuff->pduInfo.SduDataPtr[3] = (uint8)DCM_P2MAX_TIME;
+                txBuff->pduInfo.SduDataPtr[4] = (uint8)(((uint16)DCM_P2SMAX_TIME / (uint8)10) >> (uint8)0x08u);
+                txBuff->pduInfo.SduDataPtr[5] = (uint8)(DCM_P2SMAX_TIME / 10);
+                txBuff->pduInfo.SduLength = (uint8)0x06u;
+                Dcm_SendRsp();
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
             }
             else
@@ -376,7 +371,7 @@ if (TRUE == processContinue)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x11 ECU reset>
- * 
+ *
  * <handle service 0x11 ECU reset> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -384,19 +379,19 @@ if (TRUE == processContinue)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg11(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg11(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-    boolean                  positiveRspReq = TRUE;
+    boolean positiveRspReq = TRUE;
 #endif
-    Dcm_ResetType            resetValue = (uint8)0;
-    uint8                    resetTableIndex = (uint8)DCM_RESET_NUM;
-    const Dcm_ResetRowType * resetTablePtr = Dcm_ResetRow;
-    boolean                  resetFind = FALSE;
-    boolean                  processContinue = TRUE;
+    Dcm_ResetType resetValue = (uint8)0;
+    uint8 resetTableIndex = (uint8)DCM_RESET_NUM;
+    const Dcm_ResetRowType *resetTablePtr = Dcm_ResetRow;
+    boolean resetFind = FALSE;
+    boolean processContinue = TRUE;
 
     /* check if the length of the message received is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength(0x02u, rxBuff->pduInfo.SduLength);
@@ -441,22 +436,20 @@ void Dcm_RecvMsg11(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     }
 
 #if (STD_ON == DCM_SID_NRC_SUPPORT)
-if (TRUE == processContinue)
-{
-    /* check if subfunciton is supportted in current session, other wise send NRC */
-    processContinue = Dcm_CheckSubFuncSession(resetTablePtr->sessionSupportMask);
-}
+    if (TRUE == processContinue)
+    {
+        /* check if subfunciton is supportted in current session, other wise send NRC */
+        processContinue = Dcm_CheckSubFuncSession(resetTablePtr->sessionSupportMask);
+    }
 #endif
 
 #if (STD_ON == DCM_SID_NRC_SUPPORT)
-if (TRUE == processContinue)
-{
-    /* check if subfunciton is supportted in current security level, other wise send NRC */
-    processContinue = Dcm_CheckSecurityCondition(resetTablePtr->securitySupportMask);
-}
+    if (TRUE == processContinue)
+    {
+        /* check if subfunciton is supportted in current security level, other wise send NRC */
+        processContinue = Dcm_CheckSecurityCondition(resetTablePtr->securitySupportMask);
+    }
 #endif
-
-
 
     if (TRUE == processContinue)
     {
@@ -475,19 +468,19 @@ if (TRUE == processContinue)
         {
 #endif
 
-        /* set response message */
-        txBuff->pduInfo.SduDataPtr[0] = (uint8)0x51u;
-        txBuff->pduInfo.SduDataPtr[1] = resetValue;
-        txBuff->pduInfo.SduLength = (uint8)0x02u;
-        Dcm_SendRsp();
+            /* set response message */
+            txBuff->pduInfo.SduDataPtr[0] = (uint8)0x51u;
+            txBuff->pduInfo.SduDataPtr[1] = resetValue;
+            txBuff->pduInfo.SduLength = (uint8)0x02u;
+            Dcm_SendRsp();
 
-        Dcm_StartResetTimer(DCM_P2MAX_TIME);
+            Dcm_StartResetTimer(DCM_P2MAX_TIME);
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
         }
         else
         {
             /* reset service process */
-        	Appl_EcuReset();
+            Appl_EcuReset();
         }
 #endif
     }
@@ -500,14 +493,11 @@ if (TRUE == processContinue)
 }
 #endif
 
-
-
-
 #if ((DCM_READDID_NUM > 0) && (STD_ON == DCM_SERVICE_22_ENABLE))
 /******************************************************************************/
 /**
  * @brief               <handle service 0x22 read data by identifier>
- * 
+ *
  * <handle service 0x22 read data by identifier> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -515,17 +505,17 @@ if (TRUE == processContinue)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg22(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg22(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    uint16                     readDid;
-    uint8                      readTableIndex = (uint8)DCM_READDID_NUM;
-    const Dcm_ReadDidRowType * readTablePtr = Dcm_ReadDidRow;
-    boolean                    didFind = FALSE;
-    boolean                    processContinue = TRUE;
-    uint16                     readLength;
+    uint16 readDid;
+    uint8 readTableIndex = (uint8)DCM_READDID_NUM;
+    const Dcm_ReadDidRowType *readTablePtr = Dcm_ReadDidRow;
+    boolean didFind = FALSE;
+    boolean processContinue = TRUE;
+    uint16 readLength;
 
     /* check if the length of message received is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength(0x03u, rxBuff->pduInfo.SduLength);
@@ -560,21 +550,19 @@ void Dcm_RecvMsg22(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 
     if (TRUE == processContinue)
     {
-       /* check if DID is supportted in current security level, other wise send NRC */
-       processContinue = Dcm_CheckSecurityCondition(readTablePtr->securitySupportMask);
+        /* check if DID is supportted in current security level, other wise send NRC */
+        processContinue = Dcm_CheckSecurityCondition(readTablePtr->securitySupportMask);
     }
-
 
     if (TRUE == processContinue)
     {
         /* check if condition is correct, otherwise send NRC */
         processContinue = Dcm_ConditionCheck();
-
     }
     else
     {
         /* empty */
-    }   
+    }
     if (TRUE == processContinue)
     {
         /* execute read API, return read length */
@@ -598,7 +586,7 @@ void Dcm_RecvMsg22(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /*****************************************************************************/
 /**
  * @brief               <handle service 0x2E write data by identifier>
- * 
+ *
  * <handle service 0x2E write data by identifier> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -606,17 +594,17 @@ void Dcm_RecvMsg22(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg2E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg2E(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    uint16                      writeDid;
-    uint8                       writeTableIndex = (uint8)DCM_WRITEDID_NUM;
-    const Dcm_WriteDidRowType * writeTablePtr = Dcm_WriteDidRow;
-    boolean                     didFind = FALSE;
-    boolean                     processContinue = TRUE;
-    FL_ResultType               writeRet;
+    uint16 writeDid;
+    uint8 writeTableIndex = (uint8)DCM_WRITEDID_NUM;
+    const Dcm_WriteDidRowType *writeTablePtr = Dcm_WriteDidRow;
+    boolean didFind = FALSE;
+    boolean processContinue = TRUE;
+    FL_ResultType writeRet;
 
     /* check if DID is supported in current security level, otherwise send NRC */
     processContinue = Dcm_CheckSecurityCondition(writeTablePtr->securitySupportMask);
@@ -662,13 +650,12 @@ void Dcm_RecvMsg2E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 
     if (TRUE == processContinue)
     {
-       processContinue = Dcm_CheckSessionSuppMask_2E(writeTablePtr->securitySupportMask);
+        processContinue = Dcm_CheckSessionSuppMask_2E(writeTablePtr->securitySupportMask);
     }
     else
     {
-       /* empty */
+        /* empty */
     }
-
 
     if (TRUE == processContinue)
     {
@@ -711,14 +698,14 @@ void Dcm_RecvMsg2E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         /* empty */
     }
-    WunusedParameter(txBuff) /* daizhunsheng do */
-    return;
+    WunusedParameter(txBuff) /* 10086 do */
+        return;
 }
 
 /******************************************************************************/
 /**
  * @brief               <handle service 0x27 security access>
- * 
+ *
  * <handle service 0x27 security access> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -726,18 +713,18 @@ void Dcm_RecvMsg2E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg27(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg27(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    const Dcm_SessionType       secId = rxBuff->pduInfo.SduDataPtr[1];
-    uint8                       secTableIndex = (uint8)DCM_SECURITY_NUM;
-    const Dcm_SecurityRowType * secTablePtr = Dcm_SecurityRow;
-    boolean                     secIdFind = FALSE;
-    boolean                     processContinue = TRUE;
-    uint16                      checkLength;
-    boolean                     secDelayTime;
+    const Dcm_SessionType secId = rxBuff->pduInfo.SduDataPtr[1];
+    uint8 secTableIndex = (uint8)DCM_SECURITY_NUM;
+    const Dcm_SecurityRowType *secTablePtr = Dcm_SecurityRow;
+    boolean secIdFind = FALSE;
+    boolean processContinue = TRUE;
+    uint16 checkLength;
+    boolean secDelayTime;
 
     /* find sub function Id in configured security table */
     while ((secTableIndex > (uint8)0) && (FALSE == secIdFind))
@@ -756,13 +743,13 @@ void Dcm_RecvMsg27(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     /* if did not find sub function, send NRC */
     processContinue = Dcm_CheckSubFuncFind(secIdFind, rxBuff);
 
-	#if (STD_ON == DCM_SID_NRC_SUPPORT)
-	if (TRUE == processContinue)
-	{
-	   /* check if subfunciton is supportted in current session, other wise send NRC */
-	   processContinue = Dcm_CheckSubFuncSession(secTablePtr->sessionSupportMask);
-	}
-	#endif
+#if (STD_ON == DCM_SID_NRC_SUPPORT)
+    if (TRUE == processContinue)
+    {
+        /* check if subfunciton is supportted in current session, other wise send NRC */
+        processContinue = Dcm_CheckSubFuncSession(secTablePtr->sessionSupportMask);
+    }
+#endif
 
     if (TRUE == processContinue)
     {
@@ -783,19 +770,19 @@ void Dcm_RecvMsg27(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         /* empty */
     }
 
-	#if (STD_ON == DCM_SID_NRC_SUPPORT)
-	if (TRUE == processContinue)
-	{
-	   /* check if subfunction is supportted in current security level, other wise send NRC */
-	   processContinue = Dcm_CheckSecurityCondition(secTablePtr->securitySupportMask);
-	}
-	#endif
+#if (STD_ON == DCM_SID_NRC_SUPPORT)
+    if (TRUE == processContinue)
+    {
+        /* check if subfunction is supportted in current security level, other wise send NRC */
+        processContinue = Dcm_CheckSecurityCondition(secTablePtr->securitySupportMask);
+    }
+#endif
 
-	if (TRUE == processContinue)
-	{
-	    /* check if condition is correct, other wise send NRC */
-	    processContinue = Dcm_ConditionCheck();
-	}
+    if (TRUE == processContinue)
+    {
+        /* check if condition is correct, other wise send NRC */
+        processContinue = Dcm_ConditionCheck();
+    }
 
     if (TRUE == processContinue)
     {
@@ -826,8 +813,6 @@ void Dcm_RecvMsg27(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     return;
 }
 
-
-
 #if (DCM_COM_CONTROL_NUM > 0)
 /******************************************************************************/
 /**
@@ -843,29 +828,29 @@ void Dcm_RecvMsg27(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg28(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg28(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-	#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-    boolean                  positiveRspReq = TRUE;
-	#endif
-    const Dcm_ComControlType      controlValue = rxBuff->pduInfo.SduDataPtr[1];
-    uint8                         comTableIndex = (uint8)DCM_COM_CONTROL_NUM;
-    const Dcm_ComControlRowType * comTablePtr = Dcm_ComControlRow;
-    boolean                       controlTypeFind = FALSE;
-    boolean                       processContinue = TRUE;
-    Dcm_CommunicationType         communicationType;
+#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
+    boolean positiveRspReq = TRUE;
+#endif
+    const Dcm_ComControlType controlValue = rxBuff->pduInfo.SduDataPtr[1];
+    uint8 comTableIndex = (uint8)DCM_COM_CONTROL_NUM;
+    const Dcm_ComControlRowType *comTablePtr = Dcm_ComControlRow;
+    boolean controlTypeFind = FALSE;
+    boolean processContinue = TRUE;
+    Dcm_CommunicationType communicationType;
 
-	#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-	/* check if response is needed */
-	if ((rxBuff->pduInfo.SduDataPtr[1] & DCM_RSP_NOT_REQUIRED) > 0x00u)
-	{
-		positiveRspReq = FALSE;
-	}
-	else
-	{
-		/* empty */
-	}
-	#endif
+#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
+    /* check if response is needed */
+    if ((rxBuff->pduInfo.SduDataPtr[1] & DCM_RSP_NOT_REQUIRED) > 0x00u)
+    {
+        positiveRspReq = FALSE;
+    }
+    else
+    {
+        /* empty */
+    }
+#endif
     /* check if the length of message received is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength(0x03u, rxBuff->pduInfo.SduLength);
 
@@ -894,27 +879,27 @@ void Dcm_RecvMsg28(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         /* empty */
     }
 
-	#if (STD_ON == DCM_SID_NRC_SUPPORT)
-	if (TRUE == processContinue)
-	{
-	   /* check if subfunciton is supportted in current session, other wise send NRC */
-	   processContinue = Dcm_CheckSubFuncSession(comTablePtr->sessionSupportMask);
-	}
-	#endif
+#if (STD_ON == DCM_SID_NRC_SUPPORT)
+    if (TRUE == processContinue)
+    {
+        /* check if subfunciton is supportted in current session, other wise send NRC */
+        processContinue = Dcm_CheckSubFuncSession(comTablePtr->sessionSupportMask);
+    }
+#endif
 
-	#if (STD_ON == DCM_SID_NRC_SUPPORT)
-	if (TRUE == processContinue)
-	{
-	   /* check if subfunction is supportted in current security level, other wise send NRC */
-	   processContinue = Dcm_CheckSecurityCondition(comTablePtr->securitySupportMask);
-	}
-	#endif
+#if (STD_ON == DCM_SID_NRC_SUPPORT)
+    if (TRUE == processContinue)
+    {
+        /* check if subfunction is supportted in current security level, other wise send NRC */
+        processContinue = Dcm_CheckSecurityCondition(comTablePtr->securitySupportMask);
+    }
+#endif
 
-	if (TRUE == processContinue)
-	{
-	    /* check if condition is correct, other wise send NRC */
-	    processContinue = Dcm_ConditionCheck();
-	}
+    if (TRUE == processContinue)
+    {
+        /* check if condition is correct, other wise send NRC */
+        processContinue = Dcm_ConditionCheck();
+    }
 
     if (TRUE == processContinue)
     {
@@ -923,32 +908,30 @@ void Dcm_RecvMsg28(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         /* check if communication type is correct */
         if ((uint8)DCM_NORMAL_COM_MESSAGES == communicationType)
         {
-        	 if ((DCM_DISABLE_RXANDTX == controlValue) && (0 == FunctService255))
-        	 {
-        	      FunctService255 = 1;
-        	 }
-        	 else
-        	 {
-				#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-				if (TRUE == positiveRspReq)
-				{
-				#endif
-            		 /* set response message */
-            		 txBuff->pduInfo.SduDataPtr[0] = (uint8)0x68u;
-            		 txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
-            		 txBuff->pduInfo.SduLength = (uint8)0x02u;
-            		 Dcm_SendRsp();
-				#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-        		 }
-        		 else
-        		 {
-        	            /* reset service process */
-        	            Dcm_ServiceFinish();
-        		 }
-				#endif
-
-        	 }
-
+            if ((DCM_DISABLE_RXANDTX == controlValue) && (0 == FunctService255))
+            {
+                FunctService255 = 1;
+            }
+            else
+            {
+#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
+                if (TRUE == positiveRspReq)
+                {
+#endif
+                    /* set response message */
+                    txBuff->pduInfo.SduDataPtr[0] = (uint8)0x68u;
+                    txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
+                    txBuff->pduInfo.SduLength = (uint8)0x02u;
+                    Dcm_SendRsp();
+#if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
+                }
+                else
+                {
+                    /* reset service process */
+                    Dcm_ServiceFinish();
+                }
+#endif
+            }
         }
         else
         {
@@ -968,7 +951,7 @@ void Dcm_RecvMsg28(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x34 request download>
- * 
+ *
  * <handle service 0x34 request download> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -976,16 +959,16 @@ void Dcm_RecvMsg28(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************************/
-void Dcm_RecvMsg34(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg34(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    boolean       processContinue = TRUE;
-    uint32        programSize;
+    boolean processContinue = TRUE;
+    uint32 programSize;
     FL_ResultType requestRet;
-    uint8         formatId;
-    uint8         dataFormat;
+    uint8 formatId;
+    uint8 dataFormat;
 
     /* check if the length of message received is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength((uint16)11, rxBuff->pduInfo.SduLength);
@@ -1077,7 +1060,7 @@ void Dcm_RecvMsg34(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x36 transfer data>
- * 
+ *
  * <handle service 0x36 transfer data> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1085,15 +1068,15 @@ void Dcm_RecvMsg34(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg36(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    boolean       processContinue = TRUE;
-    uint32        programSize;
+    boolean processContinue = TRUE;
+    uint32 programSize;
     FL_ResultType programRet;
-    uint8         dataBlockId = (uint8)0;
+    uint8 dataBlockId = (uint8)0;
 
     /* check if the length of message received is right, otherwise send NRC */
     if (rxBuff->pduInfo.SduLength < (uint16)3)
@@ -1113,7 +1096,7 @@ void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     }
     else
     {
-    	  /*empty*/
+        /*empty*/
     }
 
     if (TRUE == processContinue)
@@ -1123,7 +1106,7 @@ void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     }
     else
     {
-    	/*empty*/
+        /*empty*/
     }
 
     if (TRUE == processContinue)
@@ -1133,7 +1116,7 @@ void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     }
     else
     {
-    	/*empty*/
+        /*empty*/
     }
 
     if (TRUE == processContinue)
@@ -1214,7 +1197,7 @@ void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x37 exit transfer data>
- * 
+ *
  * <handle service 0x37 exit transfer data> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1222,12 +1205,12 @@ void Dcm_RecvMsg36(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg37(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg37(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    boolean       processContinue = TRUE;
+    boolean processContinue = TRUE;
     FL_ResultType programRet;
 
     /* check if the length of message received is right, otherwise send NRC */
@@ -1264,7 +1247,7 @@ void Dcm_RecvMsg37(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 routine control>
- * 
+ *
  * <handle service 0x31 routine control> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1272,23 +1255,23 @@ void Dcm_RecvMsg37(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg31(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
-    boolean                           processContinue = TRUE;
-    uint16                            routineIdValue;
-    const Dcm_RoutineControlRowType * routineTablePtr = Dcm_RoutineControlRow;
-    uint8                             routineTableIndex;
-    boolean                           routineIdFind;
+    boolean processContinue = TRUE;
+    uint16 routineIdValue;
+    const Dcm_RoutineControlRowType *routineTablePtr = Dcm_RoutineControlRow;
+    uint8 routineTableIndex;
+    boolean routineIdFind;
 
     /* get routine control type */
-    const uint8                       routineControlValue = rxBuff->pduInfo.SduDataPtr[1];
+    const uint8 routineControlValue = rxBuff->pduInfo.SduDataPtr[1];
     /* check min length */
     if (DCM_UDS31_MIN_LENGTH > rxBuff->pduInfo.SduLength)
     {
-    	processContinue = FALSE;
+        processContinue = FALSE;
         /* min length is not correct,send NRC0x13 */
         Dcm_SendNcr(DCM_E_INCORRECT_MESSAGE_LENGTH);
     }
@@ -1305,10 +1288,7 @@ void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         while ((routineTableIndex > (uint8)0) && (FALSE == routineIdFind))
         {
             routineTableIndex--;
-            if ((routineIdValue == routineTablePtr->routineId)
-             && (((uint16)DCM_RX_PHY_PDU_ID == rxBuff->pduId)
-              || (((uint16)DCM_RX_FUNC_PDU_ID == rxBuff->pduId)
-               && (TRUE == routineTablePtr->funcAddrSupp))))
+            if ((routineIdValue == routineTablePtr->routineId) && (((uint16)DCM_RX_PHY_PDU_ID == rxBuff->pduId) || (((uint16)DCM_RX_FUNC_PDU_ID == rxBuff->pduId) && (TRUE == routineTablePtr->funcAddrSupp))))
             {
                 routineIdFind = TRUE;
             }
@@ -1349,11 +1329,11 @@ void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         if (routineControlValue != (uint8)DCM_START_ROUTINE)
         {
             /* sub function is not supported,send NRC0x12 */
-        	 processContinue = Dcm_CheckSubFuncFind(FALSE, rxBuff);
+            processContinue = Dcm_CheckSubFuncFind(FALSE, rxBuff);
         }
         else
         {
-        	/* empty */
+            /* empty */
         }
     }
 
@@ -1367,8 +1347,6 @@ void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         /* empty */
     }
-
-
 
     if (TRUE == processContinue)
     {
@@ -1392,7 +1370,7 @@ void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 check program pre-condition>
- * 
+ *
  * <handle service 0x31 check program pre-condition> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1400,11 +1378,11 @@ void Dcm_RecvMsg31(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_CheckProgPreCondition(const Dcm_BuffType * rxBuff,
-                               Dcm_BuffType * txBuff)
+void Dcm_CheckProgPreCondition(const Dcm_BuffType *rxBuff,
+                               Dcm_BuffType *txBuff)
 {
     uint8 conditionLength;
     if (Dcm_GetSessionMode() != DCM_SESSION_EXTEND)
@@ -1413,31 +1391,31 @@ void Dcm_CheckProgPreCondition(const Dcm_BuffType * rxBuff,
     }
     else
     {
-       /* execute routine for check programming pre-conditions */
-       conditionLength = FL_CheckProgPreCondition(&txBuff->pduInfo.SduDataPtr[4]);
+        /* execute routine for check programming pre-conditions */
+        conditionLength = FL_CheckProgPreCondition(&txBuff->pduInfo.SduDataPtr[4]);
 
-       if ((uint8)0 == conditionLength)
-       {
-          /* programming pre-conditions is accepted */
-          dcmDspProgram.condition = TRUE;
-       }
-       else
-       {
-          /* programming pre-conditions is not accepted */
-          dcmDspProgram.condition = FALSE;
-       }
+        if ((uint8)0 == conditionLength)
+        {
+            /* programming pre-conditions is accepted */
+            dcmDspProgram.condition = TRUE;
+        }
+        else
+        {
+            /* programming pre-conditions is not accepted */
+            dcmDspProgram.condition = FALSE;
+        }
 
-       /* set response message */
-       txBuff->pduInfo.SduLength = (uint16)(conditionLength + (uint16)0x05u);
-       Dcm_SendRsp();
+        /* set response message */
+        txBuff->pduInfo.SduLength = (uint16)(conditionLength + (uint16)0x05u);
+        Dcm_SendRsp();
     }
-    WunusedParameter(rxBuff) /* daizhunsheng do */
-    return;
+    WunusedParameter(rxBuff) /* 10086 do */
+        return;
 }
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 check dependency>
- * 
+ *
  * <handle service 0x31 check dependency> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1445,10 +1423,10 @@ void Dcm_CheckProgPreCondition(const Dcm_BuffType * rxBuff,
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_CheckProgDependencies(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_CheckProgDependencies(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
     FL_ResultType consistencyStatus;
 
@@ -1475,14 +1453,14 @@ void Dcm_CheckProgDependencies(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuf
 
         Dcm_SendRsp();
     }
-    WunusedParameter(rxBuff) /* daizhunsheng do */
-    return;
+    WunusedParameter(rxBuff) /* 10086 do */
+        return;
 }
 
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 checksum>
- * 
+ *
  * <handle service 0x31 checksum> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1490,10 +1468,10 @@ void Dcm_CheckProgDependencies(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuf
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_CheckMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_CheckMemory(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
     FL_ResultType checksumRet;
 
@@ -1516,14 +1494,14 @@ void Dcm_CheckMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         Dcm_SendNcr(DCM_E_CONDITIONS_NOT_CORRECT);
     }
-    WunusedParameter(txBuff) /* daizhunsheng do */
-    return;
+    WunusedParameter(txBuff) /* 10086 do */
+        return;
 }
 
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 erase block>
- * 
+ *
  * <handle service 0x31 erase block> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1531,16 +1509,16 @@ void Dcm_CheckMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_EraseMemory(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
     FL_ResultType eraseRet = (uint8)FL_INVALID_DATA;
-    uint8         parameterLen;
-    uint32        eraseAddress;
-    uint32        eraseLength;
-    uint8         index;
+    uint8 parameterLen;
+    uint32 eraseAddress;
+    uint32 eraseLength;
+    uint8 index;
 
     parameterLen = rxBuff->pduInfo.SduDataPtr[4];
     eraseAddress = Dcm_Get4Byte(&rxBuff->pduInfo.SduDataPtr[5]);
@@ -1552,8 +1530,7 @@ void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         for (index = (uint8)0; index < FL_NUM_LOGICAL_BLOCKS; index++)
         {
-            if ((eraseAddress == FL_BlkInfo[index].address)
-             && (eraseLength <= FL_BlkInfo[index].length))
+            if ((eraseAddress == FL_BlkInfo[index].address) && (eraseLength <= FL_BlkInfo[index].length))
             {
                 /* execute erase routine */
                 eraseRet = FL_EraseRoutine(index);
@@ -1571,9 +1548,7 @@ void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
             CanTp_MainFunction();
             CanIf_MainFunction();
         }
-        else if (((uint8)FL_NO_FINGERPRINT == eraseRet)
-              || ((uint8)FL_ERR_SEQUENCE == eraseRet)
-              || ((uint8)FL_NO_FLASHDRIVER == eraseRet))
+        else if (((uint8)FL_NO_FINGERPRINT == eraseRet) || ((uint8)FL_ERR_SEQUENCE == eraseRet) || ((uint8)FL_NO_FLASHDRIVER == eraseRet))
         {
             /* erase sequence error, no finger print or download data */
             Dcm_SendNcr(DCM_E_REQUEST_SEQUENCE_ERROR);
@@ -1584,7 +1559,7 @@ void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         }
         else
         {
-        	/* FL_FAILED == eraseRet */
+            /* FL_FAILED == eraseRet */
             Dcm_SendNcr(DCM_E_GENERAL_PROGRAMMING_FAILURE);
         }
     }
@@ -1592,14 +1567,14 @@ void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
     {
         Dcm_SendNcr(DCM_E_REQUEST_OUT_OF_RANGE);
     }
-    WunusedParameter(txBuff) /* daizhunsheng do */
-    return;
+    WunusedParameter(txBuff) /* 10086 do */
+        return;
 }
 
 /******************************************************************************/
 /**
  * @brief               <handle service 0x3E test precent>
- * 
+ *
  * <handle service 0x3E test present> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1607,18 +1582,18 @@ void Dcm_EraseMemory(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg3E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg3E(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-    boolean                       positiveRspReq = TRUE;
+    boolean positiveRspReq = TRUE;
 #endif
-    boolean                       processContinue = TRUE;
-    boolean                       testPresentFind = FALSE;
-    uint8                         testPresentTableIndex = (uint8)DCM_TESTPRESENT_NUM;
-    const uint8                   subFunc = (rxBuff->pduInfo.SduDataPtr[1] & (uint8)DCM_RSP_CLEAR_REQUIRED);
+    boolean processContinue = TRUE;
+    boolean testPresentFind = FALSE;
+    uint8 testPresentTableIndex = (uint8)DCM_TESTPRESENT_NUM;
+    const uint8 subFunc = (rxBuff->pduInfo.SduDataPtr[1] & (uint8)DCM_RSP_CLEAR_REQUIRED);
     const Dcm_testPresentRowType *testPresentTablePtr = Dcm_testPresentRow;
 
     /* check if the length of message received is right, otherwise send NRC */
@@ -1666,11 +1641,11 @@ void Dcm_RecvMsg3E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         if (TRUE == positiveRspReq)
         {
 #endif
-        /* set response message */
-        txBuff->pduInfo.SduDataPtr[0] = (uint8)0x7Eu;
-        txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
-        txBuff->pduInfo.SduLength = (uint8)0x02u;
-        Dcm_SendRsp();
+            /* set response message */
+            txBuff->pduInfo.SduDataPtr[0] = (uint8)0x7Eu;
+            txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
+            txBuff->pduInfo.SduLength = (uint8)0x02u;
+            Dcm_SendRsp();
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
         }
         else
@@ -1703,16 +1678,16 @@ void Dcm_RecvMsg3E(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_RecvMsg85(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
+void Dcm_RecvMsg85(const Dcm_BuffType *rxBuff, Dcm_BuffType *txBuff)
 {
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
-    boolean                       positiveRspReq = TRUE;
+    boolean positiveRspReq = TRUE;
 #endif
-    Dcm_DTCSettingType            DTCsetType;
-    uint8                         DTCsetTableIndex = (uint8)DCM_DTC_SET_NUM;
-    const Dcm_DTCSettingRowType * DTCsetTablePtr = Dcm_DTCSettingRow;
-    boolean                       DTCsetTypeFind = FALSE;
-    boolean                       processContinue = TRUE;
+    Dcm_DTCSettingType DTCsetType;
+    uint8 DTCsetTableIndex = (uint8)DCM_DTC_SET_NUM;
+    const Dcm_DTCSettingRowType *DTCsetTablePtr = Dcm_DTCSettingRow;
+    boolean DTCsetTypeFind = FALSE;
+    boolean processContinue = TRUE;
 
     /* check if the length of message received is right, otherwise send NRC */
     processContinue = Dcm_CheckMsgLength(0x02u, rxBuff->pduInfo.SduLength);
@@ -1768,11 +1743,11 @@ void Dcm_RecvMsg85(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 
     if (TRUE == processContinue)
     {
-       processContinue = Dcm_CheckSessionSuppMask(DTCsetTablePtr->sessionSupportMask);
+        processContinue = Dcm_CheckSessionSuppMask(DTCsetTablePtr->sessionSupportMask);
     }
     else
     {
-       /* empty */
+        /* empty */
     }
 
     if (TRUE == processContinue)
@@ -1781,18 +1756,17 @@ void Dcm_RecvMsg85(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
         if (TRUE == positiveRspReq)
         {
 #endif
-        /* set response message */
-        txBuff->pduInfo.SduDataPtr[0] = (uint8)0xC5u;
-        txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
-        txBuff->pduInfo.SduLength = (uint8)0x02u;
-        Dcm_SendRsp();
+            /* set response message */
+            txBuff->pduInfo.SduDataPtr[0] = (uint8)0xC5u;
+            txBuff->pduInfo.SduDataPtr[1] = rxBuff->pduInfo.SduDataPtr[1];
+            txBuff->pduInfo.SduLength = (uint8)0x02u;
+            Dcm_SendRsp();
 #if (STD_ON == DCM_SUPPRESS_POS_SUPPORT)
         }
         else
         {
             /* reset service process */
             Dcm_ServiceFinish();
-
         }
 #endif
     }
@@ -1805,11 +1779,10 @@ void Dcm_RecvMsg85(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
 }
 #endif
 
-
 /******************************************************************************/
 /**
  * @brief               <handle service 0x2E write data pending finish>
- * 
+ *
  * <handle service 0x2E write data pending finish> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1817,12 +1790,12 @@ void Dcm_RecvMsg85(const Dcm_BuffType * rxBuff, Dcm_BuffType * txBuff)
  * @param[in]           <errorCode (IN),rxBuff (IN),>
  * @param[out]          <NONE>
  * @param[in/out]       <txBuff (IN/OUT)>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_Pending2E(const FL_ResultType errorCode,
-                   const Dcm_BuffType * rxBuff,
-                   Dcm_BuffType * txBuff)
+                   const Dcm_BuffType *rxBuff,
+                   Dcm_BuffType *txBuff)
 {
     /* check if write data successful */
     if ((uint8)FL_OK == errorCode)
@@ -1845,7 +1818,7 @@ void Dcm_Pending2E(const FL_ResultType errorCode,
 /******************************************************************************/
 /**
  * @brief               <handle service 0x36 transfer data pending finish>
- * 
+ *
  * <handle service 0x36 transfer data pending finish> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1853,12 +1826,12 @@ void Dcm_Pending2E(const FL_ResultType errorCode,
  * @param[in]           <errorCode (IN),rxBuff (IN),>
  * @param[out]          <NONE>
  * @param[in/out]       <txBuff (IN/OUT)>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Dcm_Pending36(const FL_ResultType errorCode,
-                   const Dcm_BuffType * rxBuff,
-                   Dcm_BuffType * txBuff)
+                   const Dcm_BuffType *rxBuff,
+                   Dcm_BuffType *txBuff)
 {
     /* check if program data successful */
     if ((uint8)FL_OK == errorCode)
@@ -1880,7 +1853,7 @@ void Dcm_Pending36(const FL_ResultType errorCode,
 /******************************************************************************/
 /**
  * @brief               <handle service 0x31 routine control pending finish>
- * 
+ *
  * <handle service 0x31 routine control pending finish> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1888,11 +1861,11 @@ void Dcm_Pending36(const FL_ResultType errorCode,
  * @param[in]           <errorCode (IN),rxBuff (IN),>
  * @param[out]          <NONE>
  * @param[in/out]       <txBuff (IN/OUT)>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Dcm_Pending31(const FL_ResultType errorCode, const Dcm_BuffType * rxBuff,
-                                                  Dcm_BuffType * txBuff)
+void Dcm_Pending31(const FL_ResultType errorCode, const Dcm_BuffType *rxBuff,
+                   Dcm_BuffType *txBuff)
 {
     /* check if execute routine successful */
     if ((uint8)FL_OK == errorCode)
@@ -1947,7 +1920,7 @@ STATIC uint32 Dcm_ConvertAddress(uint32 address)
 /******************************************************************************/
 /**
  * @brief               <get uint32 from data buffer>
- * 
+ *
  * <get uint32 from data buffer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1955,14 +1928,14 @@ STATIC uint32 Dcm_ConvertAddress(uint32 address)
  * @param[in]           <data (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <uint32>    
+ * @return              <uint32>
  */
 /******************************************************************************/
-STATIC uint32 Dcm_Get4Byte(const uint8* data)
+STATIC uint32 Dcm_Get4Byte(const uint8 *data)
 {
     uint32 retData;
 
-    retData  =  ((uint32)data[0] << 24);
+    retData = ((uint32)data[0] << 24);
     retData += ((uint32)data[1] << 16);
     retData += ((uint32)data[2] << 8);
     retData += (uint32)data[3];
@@ -1973,7 +1946,7 @@ STATIC uint32 Dcm_Get4Byte(const uint8* data)
 /******************************************************************************/
 /**
  * @brief               <set uint32 to data buffer>
- * 
+ *
  * <set uint32 to data buffer> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -1981,10 +1954,10 @@ STATIC uint32 Dcm_Get4Byte(const uint8* data)
  * @param[in]           <data (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <uint32>    
+ * @return              <uint32>
  */
 /******************************************************************************/
-STATIC void Dcm_Set4Byte(uint8* destData, const uint32 sourceData)
+STATIC void Dcm_Set4Byte(uint8 *destData, const uint32 sourceData)
 {
     destData[0] = (uint8)(sourceData >> 24);
     destData[1] = (uint8)(sourceData >> 16);
@@ -1997,7 +1970,7 @@ STATIC void Dcm_Set4Byte(uint8* destData, const uint32 sourceData)
 /******************************************************************************/
 /**
  * @brief               <check if sub function is supported in current session>
- * 
+ *
  * <check if sub function is supported in current session> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2005,7 +1978,7 @@ STATIC void Dcm_Set4Byte(uint8* destData, const uint32 sourceData)
  * @param[in]           <sessionTable (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_CheckSubFuncSession(const Dcm_SessionType sessionSupportMask)
@@ -2030,7 +2003,7 @@ STATIC boolean Dcm_CheckSubFuncSession(const Dcm_SessionType sessionSupportMask)
 /******************************************************************************/
 /**
  * @brief               <check if RoutineID is supported in current session>
- * 
+ *
  * <check if RoutineID is supported in current session> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2038,7 +2011,7 @@ STATIC boolean Dcm_CheckSubFuncSession(const Dcm_SessionType sessionSupportMask)
  * @param[in]           <sessionTable (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_CheckRoutineIDSession(const Dcm_SessionType sessionSupportMask)
@@ -2063,7 +2036,7 @@ STATIC boolean Dcm_CheckRoutineIDSession(const Dcm_SessionType sessionSupportMas
 /******************************************************************************/
 /**
  * @brief               <check if receive message length is correct>
- * 
+ *
  * <check if receive message length is correct> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2071,7 +2044,7 @@ STATIC boolean Dcm_CheckRoutineIDSession(const Dcm_SessionType sessionSupportMas
  * @param[in]           <minlength (IN),receivedLength (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_CheckMsgLength(const uint16 standardlength, const uint16 receivedLength)
@@ -2096,7 +2069,7 @@ STATIC boolean Dcm_CheckMsgLength(const uint16 standardlength, const uint16 rece
 /******************************************************************************/
 /**
  * @brief               <check if service is supportted in current security level>
- * 
+ *
  * <check if service is supportted in current security level> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2104,7 +2077,7 @@ STATIC boolean Dcm_CheckMsgLength(const uint16 standardlength, const uint16 rece
  * @param[in]           <secLevTable (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_CheckSecurityCondition(const Dcm_SecurityType securitySupportMask)
@@ -2112,7 +2085,7 @@ STATIC boolean Dcm_CheckSecurityCondition(const Dcm_SecurityType securitySupport
     boolean ret;
 
     ret = Dcm_CheckSecuritySupp(securitySupportMask);
-    
+
     if (FALSE == ret)
     {
         /* security condition is not correct */
@@ -2129,7 +2102,7 @@ STATIC boolean Dcm_CheckSecurityCondition(const Dcm_SecurityType securitySupport
 /******************************************************************************/
 /**
  * @brief               <check if sub function is found>
- * 
+ *
  * <check if sub function is found> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2137,12 +2110,12 @@ STATIC boolean Dcm_CheckSecurityCondition(const Dcm_SecurityType securitySupport
  * @param[in]           <find (IN),rxBuff (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
-STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxBuff)
+STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType *rxBuff)
 {
-	boolean ret = TRUE;
+    boolean ret = TRUE;
 
     if (FALSE == find)
     {
@@ -2160,7 +2133,7 @@ STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxB
     }
     else
     {
-        if (((uint16)DCM_RX_FUNC_PDU_ID == rxBuff->pduId) && (0x02u == rxBuff->pduInfo.SduDataPtr[1])&&(0x85u != rxBuff->pduInfo.SduDataPtr[0]))
+        if (((uint16)DCM_RX_FUNC_PDU_ID == rxBuff->pduId) && (0x02u == rxBuff->pduInfo.SduDataPtr[1]) && (0x85u != rxBuff->pduInfo.SduDataPtr[0]))
         {
             /* reset service process */
             Dcm_ServiceFinish();
@@ -2168,7 +2141,7 @@ STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxB
         }
         else
         {
-        	ret = find;
+            ret = find;
         }
     }
 
@@ -2178,7 +2151,7 @@ STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxB
 /******************************************************************************/
 /**
  * @brief               <check if condition is correct in service>
- * 
+ *
  * <check if condition is correct in service.
  * Check if Precondition is correct when changing into prog. session.> .
  * Service ID   :       <NONE>
@@ -2187,7 +2160,7 @@ STATIC boolean Dcm_CheckSubFuncFind(const boolean find, const Dcm_BuffType * rxB
  * @param[in]           <condition (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_SessionChangeConditionCheck(Dcm_SessionType sessionValue)
@@ -2216,7 +2189,7 @@ STATIC boolean Dcm_SessionChangeConditionCheck(Dcm_SessionType sessionValue)
 /******************************************************************************/
 /**
  * @brief               <check if condition is correct in service>
- * 
+ *
  * <check if condition is correct in service> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2224,13 +2197,13 @@ STATIC boolean Dcm_SessionChangeConditionCheck(Dcm_SessionType sessionValue)
  * @param[in]           <condition (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_ConditionCheck(void)
 {
     /* defined by user, the following is an example */
-   boolean condition = TRUE;
+    boolean condition = TRUE;
 
     if (FALSE == condition)
     {
@@ -2292,12 +2265,10 @@ STATIC boolean Dcm_LowVoltageCheck(void)
     return checkResult;
 }
 
-
-
 /******************************************************************************/
 /**
  * @brief               <check if request is out of range>
- * 
+ *
  * <check if request is out of range> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2305,7 +2276,7 @@ STATIC boolean Dcm_LowVoltageCheck(void)
  * @param[in]           <condition (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <boolean>    
+ * @return              <boolean>
  */
 /******************************************************************************/
 STATIC boolean Dcm_CheckReqOutOfRange(const boolean find)
@@ -2326,7 +2297,7 @@ STATIC boolean Dcm_CheckReqOutOfRange(const boolean find)
 /******************************************************************************/
 /**
  * @brief               <execute generate seed>
- * 
+ *
  * <execute generate seed> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2334,12 +2305,12 @@ STATIC boolean Dcm_CheckReqOutOfRange(const boolean find)
  * @param[in]           <secTablePtr (IN),rxBuff (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <txBuff (IN/OUT)>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType * secTablePtr,
-                            const Dcm_BuffType * rxBuff,
-                            Dcm_BuffType * txBuff)
+STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType *secTablePtr,
+                            const Dcm_BuffType *rxBuff,
+                            Dcm_BuffType *txBuff)
 {
     Dcm_SecurityType secLevel;
 
@@ -2358,7 +2329,7 @@ STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType * secTablePtr,
         FL_NvmInfo.secAccessErr++;
         if (FL_NvmInfo.secAccessErr >= (uint8)DCM_SECURITY_ATTEMPT_NUM)
         {
-        	Dcm_StartSecurityTimer((uint32)DCM_SECURITY_TIME);
+            Dcm_StartSecurityTimer((uint32)DCM_SECURITY_TIME);
             FL_NvmInfo.secAccessErr--;
         }
         else
@@ -2393,7 +2364,7 @@ STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType * secTablePtr,
 /******************************************************************************/
 /**
  * @brief               <execute compare key>
- * 
+ *
  * <execute compare key> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -2401,14 +2372,14 @@ STATIC void Dcm_RequestSeed(const Dcm_SecurityRowType * secTablePtr,
  * @param[in]           <secTablePtr (IN),rxBuff (IN)>
  * @param[out]          <NONE>
  * @param[in/out]       <txBuff (IN/OUT)>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-STATIC void Dcm_SendKey(const Dcm_SecurityRowType * secTablePtr,
-                        const Dcm_BuffType * rxBuff,
-                        Dcm_BuffType * txBuff)
+STATIC void Dcm_SendKey(const Dcm_SecurityRowType *secTablePtr,
+                        const Dcm_BuffType *rxBuff,
+                        Dcm_BuffType *txBuff)
 {
-    SecM_KeyType    receivedKey;
+    SecM_KeyType receivedKey;
     SecM_StatusType compareStatus;
 
     /* check if seed has requested */
@@ -2472,4 +2443,3 @@ STATIC void Dcm_SendKey(const Dcm_SecurityRowType * secTablePtr,
 }
 
 /*=======[E N D   O F   F I L E]==============================================*/
-

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /** Copyright (C) 2009-2017, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <Appl.c>
  *  @brief      <App Loader>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
- *  
- *  @author     <cywang>
+ *
+ *  @author     <10086>
  *  @date       <2016-08-01>
  */
 /*============================================================================*/
@@ -18,9 +18,9 @@
 /* <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
  *   V1.0    20121227   Gary       Initial version
  *
- *   V1.1    20161015   cywang     update
+ *   V1.1    20161015   10086     update
  *
- *   V1.2    20180515   CChen      update
+ *   V1.2    20180515   10086      update
  */
 /*============================================================================*/
 
@@ -55,7 +55,6 @@ STATIC uint32 ApplShutDownTimer = 0UL;
 STATIC uint32 ApplBootStayTimer = 0UL;
 #endif
 
-
 /*=======[I N T E R N A L   F U N C T I O N   D E C L A R A T I O N S]========*/
 STATIC void Appl_InitNvmInfo(void);
 
@@ -76,7 +75,7 @@ STATIC void Appl_GotoAppSW(void);
 /******************************************************************************/
 /**
  * @brief               <ECU initialize>
- * 
+ *
  * <This routine shall be called by the boot code contained in the flash loader
  *  to initialize common hardware.> .
  * Service ID   :       <NONE>
@@ -85,7 +84,7 @@ STATIC void Appl_GotoAppSW(void);
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType Appl_EcuStartup(void)
@@ -96,13 +95,12 @@ FL_ResultType Appl_EcuStartup(void)
     (void)Appl_FlStartup();
 
     Appl_InitNvmInfo();
-	
-	if(MCU_POWER_ON_RESET == Mcu_GetResetReason())
-    {
-    	 *(uint32 *)FL_BOOT_MODE = 0x00000000U;
-    	 *(uint32 *)FL_APPL_UPDATE = 0x00000000U;
-    }
 
+    if (MCU_POWER_ON_RESET == Mcu_GetResetReason())
+    {
+        *(uint32 *)FL_BOOT_MODE = 0x00000000U;
+        *(uint32 *)FL_APPL_UPDATE = 0x00000000U;
+    }
 
     /* check if bootloader program is requested in app */
     if ((uint32)FL_EXT_PROG_REQUEST_RECEIVED == *((uint32 *)FL_BOOT_MODE))
@@ -150,7 +148,7 @@ FL_ResultType Appl_EcuStartup(void)
         }
         else
         {
-        	Wdg_Start();
+            Wdg_Start();
         }
     }
 
@@ -160,9 +158,9 @@ FL_ResultType Appl_EcuStartup(void)
 /******************************************************************************/
 /**
  * @brief               <flashloader initialize>
- * 
+ *
  * <This routine shall be called by the flash loader to initialize the software
- *  environment needed for ECU reprogramming (after the decision to switch to 
+ *  environment needed for ECU reprogramming (after the decision to switch to
  *  flash loader mode).> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -170,22 +168,22 @@ FL_ResultType Appl_EcuStartup(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType Appl_FlStartup(void)
 {
-	/* MCU Clock init. */
-	Mcu_Init(Mcu_ConfigRoot);
+    /* MCU Clock init. */
+    Mcu_Init(Mcu_ConfigRoot);
 
-	Mcu_InitClock(0);
+    Mcu_InitClock(0);
 
-	while (MCU_PLL_UNLOCKED == Mcu_GetPllStatus())
-	{
-		/* wait for PLL locked */
-	}
+    while (MCU_PLL_UNLOCKED == Mcu_GetPllStatus())
+    {
+        /* wait for PLL locked */
+    }
 
-	Mcu_DistributePllClock();
+    Mcu_DistributePllClock();
 
     STM_Init();
 
@@ -220,7 +218,7 @@ FL_ResultType Appl_FlStartup(void)
 /******************************************************************************/
 /**
  * @brief               <ECU goto sleep mode>
- * 
+ *
  * <This routine shall be called by the flash loader to shut down the ECU (put
  *  the ECU to sleep).> .
  * Service ID   :       <NONE>
@@ -229,7 +227,7 @@ FL_ResultType Appl_FlStartup(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Appl_EcuShutdown(void)
@@ -243,8 +241,8 @@ void Appl_EcuShutdown(void)
 /******************************************************************************/
 /**
  * @brief               <ECU reset>
- * 
- * <This routine shall be called by the flashloader to reset the ECU upon 
+ *
+ * <This routine shall be called by the flashloader to reset the ECU upon
  *  request from the external programming device.>
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -252,7 +250,7 @@ void Appl_EcuShutdown(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Appl_EcuReset(void)
@@ -268,9 +266,9 @@ void Appl_EcuReset(void)
 /******************************************************************************/
 /**
  * @brief               <check application software consistency>
- * 
- * <This routine shall be called by the flashloader to check whether the 
- *  individual parts (logical blocks) that make up the application software of 
+ *
+ * <This routine shall be called by the flashloader to check whether the
+ *  individual parts (logical blocks) that make up the application software of
  *  an ECU are consistent with each other.> .
  * Service ID   :       <NONE>
  * Sync/Async   :       <Synchronous>
@@ -278,7 +276,7 @@ void Appl_EcuReset(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <FL_ResultType>    
+ * @return              <FL_ResultType>
  */
 /******************************************************************************/
 FL_ResultType Appl_CheckConsistency(void)
@@ -286,7 +284,7 @@ FL_ResultType Appl_CheckConsistency(void)
     /* return result */
     FL_ResultType ret = (uint8)FL_OK;
     /* block number */
-    uint8         blockIndex = (uint8)0;
+    uint8 blockIndex = (uint8)0;
 
     for (blockIndex = (uint8)0;
          (blockIndex < FL_NUM_LOGICAL_BLOCKS) && ((uint8)FL_OK == ret);
@@ -294,9 +292,9 @@ FL_ResultType Appl_CheckConsistency(void)
     {
         /* check if all block is valid */
         if (FALSE == FL_NvmInfo.blockInfo[blockIndex].blkValid
-        	/* Added by fast project Custom requirements.
-        	 * NO write operation for NVRAM_BLOCK, the block should not check the consistent */
-		    && blockIndex != FL_NUM_NVRAM_BLOCK_LOCATION_IN_TAB)
+            /* Added by fast project Custom requirements.
+             * NO write operation for NVRAM_BLOCK, the block should not check the consistent */
+            && blockIndex != FL_NUM_NVRAM_BLOCK_LOCATION_IN_TAB)
         {
             ret = (uint8)FL_FAILED;
         }
@@ -312,7 +310,7 @@ FL_ResultType Appl_CheckConsistency(void)
 /******************************************************************************/
 /**
  * @brief               <10ms task>
- * 
+ *
  * <This routine shall be called by functions of the flash loader runtime
  *  environment and the security module at least every 500 milliseconds.> .
  * Service ID   :       <NONE>
@@ -321,7 +319,7 @@ FL_ResultType Appl_CheckConsistency(void)
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 void Appl_UpdateTriggerCondition(void)
@@ -365,16 +363,17 @@ void Appl_UpdateTriggerCondition(void)
 #endif
         /* if state255 is received, reponse 0x28 */
         if (2 == FunctService255)
-         {
-               PosResponse255();
-               /* keep in state255 */
-               FunctService255 = 3;
-         }
+        {
+            PosResponse255();
+            /* keep in state255 */
+            FunctService255 = 3;
+        }
 #ifdef LED_DEBUG
         led_cnt++;
-        if (led_cnt >= 30){
-        	led_cnt = 0;
-        	P10_OUT.B.P7 = ~(P10_OUT.B.P7);
+        if (led_cnt >= 30)
+        {
+            led_cnt = 0;
+            P10_OUT.B.P7 = ~(P10_OUT.B.P7);
         }
 #endif
     }
@@ -388,7 +387,7 @@ void Appl_UpdateTriggerCondition(void)
            SecM_Seed = 0x0;
        }
      SecM_Seed++;
-#endif   // add by ghc 2018.4.9
+#endif // add by 10086 2018.4.9
 
     CanIf_MainFunction();
 
@@ -398,16 +397,16 @@ void Appl_UpdateTriggerCondition(void)
 /******************************************************************************/
 /**
  * @brief               <memory copy>
- * 
+ *
  * <MISRA C 2004 forbid to use memcpy() lib, only used  to copy data buffer of
  *  indirect address.> .
  * @param[in]           <source (IN), length (IN)>
  * @param[out]          <dest (OUT)>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Appl_Memcpy(uint8 * dest, const uint8 *source, uint32 length)
+void Appl_Memcpy(uint8 *dest, const uint8 *source, uint32 length)
 {
     while (length > 0UL)
     {
@@ -431,16 +430,16 @@ void Appl_Memcpy(uint8 * dest, const uint8 *source, uint32 length)
 /******************************************************************************/
 /**
  * @brief               <memory set>
- * 
+ *
  * <MISRA C 2004 forbid to use memset() lib, only used  to set data buffer of
  *  indirect address.> .
  * @param[in]           <source (IN), length (IN)>
  * @param[out]          <dest (OUT)>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
-void Appl_Memset(uint8 * dest, const uint8 source, uint32 length)
+void Appl_Memset(uint8 *dest, const uint8 source, uint32 length)
 {
     while (length > 0UL)
     {
@@ -463,12 +462,12 @@ void Appl_Memset(uint8 * dest, const uint8 source, uint32 length)
 /******************************************************************************/
 /**
  * @brief               <jump to application software>
- * 
+ *
  * <jump to application software> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Appl_JumpApp(void)
@@ -479,18 +478,18 @@ STATIC void Appl_JumpApp(void)
 /******************************************************************************/
 /**
  * @brief               <get NVM information>
- * 
+ *
  * <get information from flash about bootloader information(e.g.fingerprint)> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Appl_InitNvmInfo(void)
 {
     /* block number */
-    uint8             blockIndex = (uint8)0;
+    uint8 blockIndex = (uint8)0;
 
     /* CRC32 parameter */
     SecM_CRCParamType crcParam;
@@ -536,12 +535,12 @@ STATIC void Appl_InitNvmInfo(void)
 /******************************************************************************/
 /**
  * @brief               <time count for ECU shut down>
- * 
+ *
  * <time count for ECU shut down> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Appl_EcuShutdownTimer(void)
@@ -549,15 +548,13 @@ STATIC void Appl_EcuShutdownTimer(void)
     /* current security level */
     Dcm_SecurityType currentSecLev;
     /* current session mode */
-    Dcm_SessionType  currentSesMod;
+    Dcm_SessionType currentSesMod;
 
     currentSecLev = Dcm_GetSecurityLevel();
     currentSesMod = Dcm_GetSessionMode();
 
     /* if diagnostic leave default session mode or security unlocked, stop sleep timer count */
-    if ((ApplShutDownTimer > 0UL)
-     && ((uint8)DCM_SECURITY_LOCKED == currentSecLev)
-     && ((uint8)DCM_SESSION_DEFAULT == currentSesMod))
+    if ((ApplShutDownTimer > 0UL) && ((uint8)DCM_SECURITY_LOCKED == currentSecLev) && ((uint8)DCM_SESSION_DEFAULT == currentSesMod))
     {
         ApplShutDownTimer--;
         /* if shut down time out, set ECU to sleep state */
@@ -583,12 +580,12 @@ STATIC void Appl_EcuShutdownTimer(void)
 /******************************************************************************/
 /**
  * @brief               <time count for ECU stay in boot>
- * 
+ *
  * <time count for ECU stay in boot> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Appl_BootStayTimer(void)
@@ -596,15 +593,13 @@ STATIC void Appl_BootStayTimer(void)
     /* current security level */
     Dcm_SecurityType currentSecLev;
     /* current session mode */
-    Dcm_SessionType  currentSesMod;
+    Dcm_SessionType currentSesMod;
 
     currentSecLev = Dcm_GetSecurityLevel();
     currentSesMod = Dcm_GetSessionMode();
 
     /* if diagnostic leave default session mode or security unlocked, stop boot stay timer count */
-    if ((ApplBootStayTimer > 0UL)
-     && ((uint8)DCM_SECURITY_LOCKED == currentSecLev)
-     && ((uint8)DCM_SESSION_DEFAULT == currentSesMod))
+    if ((ApplBootStayTimer > 0UL) && ((uint8)DCM_SECURITY_LOCKED == currentSecLev) && ((uint8)DCM_SESSION_DEFAULT == currentSesMod))
     {
         ApplBootStayTimer--;
         /* if boot stay time out, jump to App */
@@ -619,7 +614,7 @@ STATIC void Appl_BootStayTimer(void)
     }
     else
     {
-    	Wdg_Start();
+        Wdg_Start();
         ApplBootStayTimer = 0UL;
     }
 
@@ -630,12 +625,12 @@ STATIC void Appl_BootStayTimer(void)
 /******************************************************************************/
 /**
  * @brief               <go to application software>
- * 
+ *
  * <go to application software> .
  * @param[in]           <NONE>
  * @param[out]          <NONE>
  * @param[in/out]       <NONE>
- * @return              <NONE>    
+ * @return              <NONE>
  */
 /******************************************************************************/
 STATIC void Appl_GotoAppSW(void)

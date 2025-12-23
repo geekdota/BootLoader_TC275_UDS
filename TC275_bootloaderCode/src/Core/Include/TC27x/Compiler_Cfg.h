@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*  Copyright (C) 2016, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
+ *
  *  @file       <Compiler_Cfg.h>
  *  @brief      <Briefly describe file(one line)>
- *  
+ *
  *  <Compiler: HighTec    MCU:TC275>
- *  
+ *
  *  @author     <chen xue hua>
  *  @date       <2013-02-27>
  */
@@ -18,21 +18,21 @@
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /*  <VERSION>    <DATE>    <AUTHOR>    <REVISION LOG>
- *  V1.0.0       20130227  chenxuehua  Initial version
- *  V1.0.1       20140916  wbn         add EcuM_MemoryAndPointerClasses
+ *  V1.0.0       20130227  10086  Initial version
+ *  V1.0.1       20140916  10086         add EcuM_MemoryAndPointerClasses
  */
 /*============================================================================*/
 
 /*=======[V E R S I O N  I N F O R M A T I O N]===============================*/
-#define COMPILER_CFG_VENDOR_ID         62
-#define COMPILER_CFG_MODULE_ID         1
-#define COMPILER_CFG_AR_MAJOR_VERSION  4
-#define COMPILER_CFG_AR_MINOR_VERSION  2
-#define COMPILER_CFG_AR_PATCH_VERSION  2
-#define COMPILER_CFG_SW_MAJOR_VERSION  1
-#define COMPILER_CFG_SW_MINOR_VERSION  0
-#define COMPILER_CFG_SW_PATCH_VERSION  0
-#define COMPILER_CFG_VENDOR_API_INFIX  0
+#define COMPILER_CFG_VENDOR_ID 62
+#define COMPILER_CFG_MODULE_ID 1
+#define COMPILER_CFG_AR_MAJOR_VERSION 4
+#define COMPILER_CFG_AR_MINOR_VERSION 2
+#define COMPILER_CFG_AR_PATCH_VERSION 2
+#define COMPILER_CFG_SW_MAJOR_VERSION 1
+#define COMPILER_CFG_SW_MINOR_VERSION 0
+#define COMPILER_CFG_SW_PATCH_VERSION 0
+#define COMPILER_CFG_VENDOR_API_INFIX 0
 
 /* @req COMPILER055 @req COMPILER054 */
 /*=======[M A C R O S]========================================================*/
@@ -44,47 +44,47 @@
 /* Configurable memory class for ISR code. */
 #define OS_CODE_FAST
 
-/* 
- * Configurable memory class for all global or static variables that are never 
- * initialized. 
+/*
+ * Configurable memory class for all global or static variables that are never
+ * initialized.
  */
 #define OS_VAR_NOINIT
 
-/* 
- * Configurable memory class for all global or static variables that are 
- * initialized only after power on reset. 
+/*
+ * Configurable memory class for all global or static variables that are
+ * initialized only after power on reset.
  */
 #define OS_VAR_POWER_ON_INIT
 
 /*
- * Configurable memory class for all global or static variables that are 
- * initialized after every reset. 
+ * Configurable memory class for all global or static variables that are
+ * initialized after every reset.
  */
 #define OS_VAR
 
-/* 
- * Configurable memory class for all global or static variables that will 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that will
+ * be accessed frequently.
  */
 #define OS_VAR_NOINIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define OS_VAR_POWER_ON_INIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
-#define OS_VAR_FAST 
+#define OS_VAR_FAST
 
 /* Configurable memory class for global or static constants. */
 #define OS_CONST
 
 /*
- * Configurable memory class for global or static constants that will be 
+ * Configurable memory class for global or static constants that will be
  * accessed frequently.
  */
 #define OS_CONST_FAST
@@ -93,19 +93,19 @@
 #define OS_CONST_PBCFG
 
 /*
- * Configurable memory class for pointers to applicaiton data(expected to be 
+ * Configurable memory class for pointers to applicaiton data(expected to be
  * in RAM or ROM)passed via API.
  */
 #define OS_APPL_DATA
 
-/* 
+/*
  * Configurable memory class for pointers to applicaiton constants(expected to
  * be certainly in ROM,for instance point of Init-function)passed via API.
  */
 #define OS_APPL_CONST
 
-/* 
- * Configurable memory class for pointers to applicaiton functions(e.g. call 
+/*
+ * Configurable memory class for pointers to applicaiton functions(e.g. call
  * back function pointers).
  */
 #define OS_APPL_CODE
@@ -118,47 +118,47 @@
 /* Configurable memory class for ISR code. */
 #define CAN_CODE_FAST
 
-/* 
- * Configurable memory class for all global or static variables that are never 
- * initialized. 
+/*
+ * Configurable memory class for all global or static variables that are never
+ * initialized.
  */
 #define CAN_VAR_NOINIT
 
-/* 
- * Configurable memory class for all global or static variables that are 
- * initialized only after power on reset. 
+/*
+ * Configurable memory class for all global or static variables that are
+ * initialized only after power on reset.
  */
 #define CAN_VAR_POWER_ON_INIT
 
 /*
- * Configurable memory class for all global or static variables that are 
- * initialized after every reset. 
+ * Configurable memory class for all global or static variables that are
+ * initialized after every reset.
  */
 #define CAN_VAR
 
-/* 
- * Configurable memory class for all global or static variables that will 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that will
+ * be accessed frequently.
  */
 #define CAN_VAR_NOINIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define CAN_VAR_POWER_ON_INIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
-#define CAN_VAR_FAST 
+#define CAN_VAR_FAST
 
 /* Configurable memory class for global or static constants. */
 #define CAN_CONST
 
 /*
- * Configurable memory class for global or static constants that will be 
+ * Configurable memory class for global or static constants that will be
  * accessed frequently.
  */
 #define CAN_CONST_FAST
@@ -167,23 +167,22 @@
 #define CAN_CONST_PBCFG
 
 /*
- * Configurable memory class for pointers to applicaiton data(expected to be 
+ * Configurable memory class for pointers to applicaiton data(expected to be
  * in RAM or ROM)passed via API.
  */
 #define CAN_APPL_DATA
 
-/* 
+/*
  * Configurable memory class for pointers to applicaiton constants(expected to
  * be certainly in ROM,for instance point of Init-function)passed via API.
  */
 #define CAN_APPL_CONST
 
-/* 
- * Configurable memory class for pointers to applicaiton functions(e.g. call 
+/*
+ * Configurable memory class for pointers to applicaiton functions(e.g. call
  * back function pointers).
  */
 #define CAN_APPL_CODE
-
 
 /*=======[CanIf_MemoryAndPointerClasses]========================================*/
 #define CANIF_CODE
@@ -200,7 +199,7 @@
 
 #define CANIF_VAR_POWER_ON_INIT_FAST
 
-#define CANIF_VAR_FAST 
+#define CANIF_VAR_FAST
 
 #define CANIF_CONST
 
@@ -214,7 +213,6 @@
 
 #define CANIF_APPL_CODE
 
-
 /* @req COMPILER044 @req COMPILER040 */
 /*=======[OSEKCOM_MemoryAndPointerClasses]====================================*/
 /* Configurable memory class for code. */
@@ -223,39 +221,39 @@
 /* Configurable memory class for ISR code. */
 #define COM_CODE_FAST
 
-/* 
- * Configurable memory class for all global or static variables that are never 
- * initialized. 
+/*
+ * Configurable memory class for all global or static variables that are never
+ * initialized.
  */
 #define COM_VAR_NOINIT
 
-/* 
- * Configurable memory class for all global or static variables that are 
- * initialized only after power on reset. 
+/*
+ * Configurable memory class for all global or static variables that are
+ * initialized only after power on reset.
  */
 #define COM_VAR_POWER_ON_INIT
 
 /*
- * Configurable memory class for all global or static variables that are 
- * initialized after every reset. 
+ * Configurable memory class for all global or static variables that are
+ * initialized after every reset.
  */
 #define COM_VAR
 
-/* 
- * Configurable memory class for all global or static variables that will 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that will
+ * be accessed frequently.
  */
 #define COM_VAR_NOINIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define COM_VAR_POWER_ON_INIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define COM_VAR_FAST
 
@@ -263,7 +261,7 @@
 #define COM_CONST
 
 /*
- * Configurable memory class for global or static constants that will be 
+ * Configurable memory class for global or static constants that will be
  * accessed frequently.
  */
 #define COM_CONST_FAST
@@ -272,19 +270,19 @@
 #define COM_CONST_PBCFG
 
 /*
- * Configurable memory class for pointers to applicaiton data(expected to be 
+ * Configurable memory class for pointers to applicaiton data(expected to be
  * in RAM or ROM)passed via API.
  */
 #define COM_APPL_DATA
 
-/* 
+/*
  * Configurable memory class for pointers to applicaiton constants(expected to
  * be certainly in ROM,for instance point of Init-function)passed via API.
  */
 #define COM_APPL_CONST
 
-/* 
- * Configurable memory class for pointers to applicaiton functions(e.g. call 
+/*
+ * Configurable memory class for pointers to applicaiton functions(e.g. call
  * back function pointers).
  */
 #define COM_APPL_CODE
@@ -303,7 +301,7 @@
 
 #define CANSM_VAR_POWER_ON_INIT_FAST
 
-#define CANSM_VAR_FAST 
+#define CANSM_VAR_FAST
 
 #define CANSM_CONST
 
@@ -321,29 +319,17 @@
 
 #define NM_CODE
 
-
-
 #define NM_VAR_NOINIT
 
-
-
 #define NM_VAR_POWER_ON_INIT
-
-
 
 #define NM_VAR
 
 #define NM_CONST
 
-
-
 #define NM_APPL_DATA
 
-
-
 #define NM_APPL_CONST
-
-
 
 #define NM_APPL_CODE
 
@@ -351,32 +337,19 @@
 
 #define OSEKNM_CODE
 
-
-
 #define OSEKNM_VAR_NOINIT
 
-
-
 #define OSEKNM_VAR_POWER_ON_INIT
-
-
 
 #define OSEKNM_VAR
 
 #define OSEKNM_CONST
 
-
-
 #define OSEKNM_APPL_DATA
-
-
 
 #define OSEKNM_APPL_CONST
 
-
-
 #define OSEKNM_APPL_CODE
-
 
 /*=======[ComM_MemoryAndPointerClasses]========================================*/
 #define COMM_CODE
@@ -393,7 +366,7 @@
 
 #define COMM_VAR_POWER_ON_INIT_FAST
 
-#define COMM_VAR_FAST 
+#define COMM_VAR_FAST
 
 #define COMM_CONST
 
@@ -415,39 +388,39 @@
 /* Configurable memory class for ISR code. */
 #define XCP_CODE_FAST
 
-/* 
- * Configurable memory class for all global or static variables that are never 
- * initialized. 
+/*
+ * Configurable memory class for all global or static variables that are never
+ * initialized.
  */
 #define XCP_VAR_NOINIT
 
-/* 
- * Configurable memory class for all global or static variables that are 
- * initialized only after power on reset. 
+/*
+ * Configurable memory class for all global or static variables that are
+ * initialized only after power on reset.
  */
 #define XCP_VAR_POWER_ON_INIT
 
 /*
- * Configurable memory class for all global or static variables that are 
- * initialized after every reset. 
+ * Configurable memory class for all global or static variables that are
+ * initialized after every reset.
  */
 #define XCP_VAR
 
-/* 
- * Configurable memory class for all global or static variables that will 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that will
+ * be accessed frequently.
  */
 #define XCP_VAR_NOINIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define XCP_VAR_POWER_ON_INIT_FAST
 
-/* 
- * Configurable memory class for all global or static variables that have at 
- * be accessed frequently. 
+/*
+ * Configurable memory class for all global or static variables that have at
+ * be accessed frequently.
  */
 #define XCP_VAR_FAST
 
@@ -455,7 +428,7 @@
 #define XCP_CONST
 
 /*
- * Configurable memory class for global or static constants that will be 
+ * Configurable memory class for global or static constants that will be
  * accessed frequently.
  */
 #define XCP_CONST_FAST
@@ -464,19 +437,19 @@
 #define XCP_CONST_PBCFG
 
 /*
- * Configurable memory class for pointers to applicaiton data(expected to be 
+ * Configurable memory class for pointers to applicaiton data(expected to be
  * in RAM or ROM)passed via API.
  */
 #define XCP_APPL_DATA
 
-/* 
+/*
  * Configurable memory class for pointers to applicaiton constants(expected to
  * be certainly in ROM,for instance point of Init-function)passed via API.
  */
 #define XCP_APPL_CONST
 
-/* 
- * Configurable memory class for pointers to applicaiton functions(e.g. call 
+/*
+ * Configurable memory class for pointers to applicaiton functions(e.g. call
  * back function pointers).
  */
 #define XCP_APPL_CODE
@@ -496,7 +469,7 @@
 
 #define ECUM_VAR_POWER_ON_INIT_FAST
 
-#define ECUM_VAR_FAST 
+#define ECUM_VAR_FAST
 
 #define ECUM_CONST
 
@@ -509,7 +482,6 @@
 #define ECUM_APPL_CONST
 
 #define ECUM_APPL_CODE
-
 
 /*=======[Flash_MemoryAndPointerClasses]========================================*/
 #define FLS_CODE
@@ -526,7 +498,7 @@
 
 #define FLS_VAR_POWER_ON_INIT_FAST
 
-#define FLS_VAR_FAST 
+#define FLS_VAR_FAST
 
 #define FLS_CONST
 
@@ -759,8 +731,6 @@
  */
 #define FEE_APPL_CODE
 
-
-
 /*=======[Crc_MemoryAndPointerClasses]========================================*/
 /* Configurable memory class for code. */
 #define CRC_CODE
@@ -921,7 +891,7 @@
 
 #define CANTP_VAR_POWER_ON_INIT_FAST
 
-#define CANTP_VAR_FAST 
+#define CANTP_VAR_FAST
 
 #define CANTP_CONST
 
@@ -950,7 +920,7 @@
 
 #define DCM_VAR_POWER_ON_INIT_FAST
 
-#define DCM_VAR_FAST 
+#define DCM_VAR_FAST
 
 #define DCM_CONST
 
@@ -966,7 +936,6 @@
 
 #define MCU_CODE
 
-
 /* ================================  zheda's compiler_Cfg.h ============================================ */
 
 /*
@@ -978,13 +947,12 @@ Tasking Keyword for __bisr_
 Tasking Keyword for Trap
 */
 
-
 #define TRAP __trap
 /*
 volatile keyword
 */
 
-#define _VOLATILE_     volatile
+#define _VOLATILE_ volatile
 
 /*
 
@@ -992,28 +960,24 @@ Inline keyword
 
 */
 
-#define _INLINE_       inline
+#define _INLINE_ inline
 
 /*
 extern keyword
 */
 
-#define _EXTERN_       extern
-
+#define _EXTERN_ extern
 
 /*
 debug instruction
 */
-#define DEBUG()			__debug()
-
-
+#define DEBUG() __debug()
 
 /*
 Tasking Intrinsic: move contents of the addressed core SFR into a data register
 */
 
 #define MFCR(Reg) (__mfcr((Reg)))
-
 
 #if 0
 /*
@@ -1074,13 +1038,11 @@ Use of Atomic Write Intrinsic from Tasking. A direct type cast to "int"
 is needed to avoid Misra Violation
 */
 #if 0
-#define IMASKLDMST(address,val,offset,bits) \
-                               ( __imaskldmst((sint32*)(address),\
-                                 (sint32)(val),     \
-                                 (sint32)(offset),  \
-                                 (sint32)(bits)) )
-
-
+#define IMASKLDMST(address, val, offset, bits) \
+  (__imaskldmst((sint32 *)(address),           \
+                (sint32)(val),                 \
+                (sint32)(offset),              \
+                (sint32)(bits)))
 
 #endif
 /*******************************************************************************
@@ -1106,9 +1068,9 @@ Case 1:
   uint32 TESTVAR;  assume the variable is located at 0xd0001000
   IMASKLDMST(&TESTVAR,10,3,4);
 
-	This will produce assembly instructions like
+  This will produce assembly instructions like
     imask	e0,#10,#3,#4
-	ldmst	TESTVAR,e0
+  ldmst	TESTVAR,e0
 
 Case 2:
 
@@ -1128,14 +1090,14 @@ Case 2:
 
 */
 
-#define EXT_IMASKLDMST(address,val,offset,bits) \
-  do {                                                                    \
-    register uint32 *EXT_IMASKLDMSTaddr = address;                                \
-    register uint32 EXT_IMASKLDMSTval = val;                                 \
-    register uint32 EXT_IMASKLDMSToffset = offset;                                 \
-    __asm("  imask e2,%0,%1,#" #bits " \n ldmst [%2]0,e2" : : "d" (EXT_IMASKLDMSTval), "d" (EXT_IMASKLDMSToffset), "a" (EXT_IMASKLDMSTaddr) : "e2"); \
-  } while(0)
-
+#define EXT_IMASKLDMST(address, val, offset, bits)                                                                                                \
+  do                                                                                                                                              \
+  {                                                                                                                                               \
+    register uint32 *EXT_IMASKLDMSTaddr = address;                                                                                                \
+    register uint32 EXT_IMASKLDMSTval = val;                                                                                                      \
+    register uint32 EXT_IMASKLDMSToffset = offset;                                                                                                \
+    __asm("  imask e2,%0,%1,#" #bits " \n ldmst [%2]0,e2" : : "d"(EXT_IMASKLDMSTval), "d"(EXT_IMASKLDMSToffset), "a"(EXT_IMASKLDMSTaddr) : "e2"); \
+  } while (0)
 
 /*******************************************************************************
 ** Macro Syntax : EXTRACT(value,pos,width)                                    **
@@ -1152,9 +1114,9 @@ Case 2:
 **                  mask and loading the same                                 **
 *******************************************************************************/
 #if 0
-#define EXTRACT(value,pos,width)            (__extru((sint32)(value), \
-                                                    (sint32)(pos), \
-                                                    (sint32)(width)))
+#define EXTRACT(value, pos, width) (__extru((sint32)(value), \
+                                            (sint32)(pos),   \
+                                            (sint32)(width)))
 
 /*******************************************************************************
 ** Macro Syntax : Mcal_CountLeadingZeros(Variable)                            **
@@ -1169,7 +1131,7 @@ Case 2:
 **                                                                            **
 *******************************************************************************/
 
-#define Mcal_CountLeadingZeros(Variable) ( __clz((sint32)(Variable)))
+#define Mcal_CountLeadingZeros(Variable) (__clz((sint32)(Variable)))
 
 #endif
 #endif /* end of COMPILER_CFG_H */

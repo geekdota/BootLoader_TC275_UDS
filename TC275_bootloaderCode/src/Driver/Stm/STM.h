@@ -10,15 +10,15 @@
  *
  *  <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <zuxiong.ding>
+ *  @author     <10086>
  *  @date       <2017-5-09>
  */
 /*============================================================================*/
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /*  <VERSION>    <DATE>    <AUTHOR>      <REVISION LOG>
- *  V1.0.0       20170509  zuxiong,ding   Initial version
- *  V1.0.1       20180511  CChen          update
+ *  V1.0.0       20170509  10086   Initial version
+ *  V1.0.1       20180511  10086          update
  */
 /*============================================================================*/
 

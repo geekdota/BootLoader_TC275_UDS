@@ -1,24 +1,24 @@
 /*============================================================================*/
 /*** Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
- *  
+ *
+ *
  *  @file       <CanTp.c>
  *  @brief      <TP (ISO 15765) source component>
- *  
+ *
  *  <Compiler: HighTec4.6    MCU:TC27x>
- *  
- *  @author     <Tommy Yu>
+ *
+ *  @author     <10086>
  *  @date       <2012-12-28>
  */
 /*============================================================================*/
 
 /*=========[R E V I S I O N   H I S T O R Y]====================================*/
 /** <VERSION>  <DATE>  <AUTHOR>     <REVISION LOG>
- *    V1.0    20121228 Tommy Yu     Initial version
- *    V1.1    20180511 CChen        update
+ *    V1.0    20121228 10086     Initial version
+ *    V1.1    20180511 10086       update
  */
 /*============================================================================*/
 
@@ -28,61 +28,61 @@
 #include "dcm.h"
 
 /*=======[M A C R O S]========================================================*/
-#define CANTP_FC_STATUS_CTS      0
-#define CANTP_FC_STATUS_WT       1
-#define CANTP_FC_STATUS_OVFLW    2
+#define CANTP_FC_STATUS_CTS 0
+#define CANTP_FC_STATUS_WT 1
+#define CANTP_FC_STATUS_OVFLW 2
 
 /** PCI mask */
-#define CANTP_TPCI_MASK    0xF0U
+#define CANTP_TPCI_MASK 0xF0U
 
 /** Single Frame */
-#define CANTP_TPCI_SF      0x00U
+#define CANTP_TPCI_SF 0x00U
 
 /** First Frame */
-#define CANTP_TPCI_FF      0x10U
+#define CANTP_TPCI_FF 0x10U
 
 /** Consecutive Frame */
-#define CANTP_TPCI_CF      0x20U
+#define CANTP_TPCI_CF 0x20U
 
 /** Flow Control */
-#define CANTP_TPCI_FC      0x30U
+#define CANTP_TPCI_FC 0x30U
 
 /** Single frame data length mask */
-#define CANTP_TPCI_DL      0x0FU
+#define CANTP_TPCI_DL 0x0FU
 
 /** Flow control status mask */
-#define CANTP_TPCI_FS_MASK    0x0FU
+#define CANTP_TPCI_FS_MASK 0x0FU
 
 /** max data length of SF with standard address */
-#define CANTP_STD_ADDR_MAX_SF_LEGNTH    7
+#define CANTP_STD_ADDR_MAX_SF_LEGNTH 7
 
 /** max data length of SF with extended address */
-#define CANTP_EXT_ADDR_MAX_SF_LEGNTH    6
+#define CANTP_EXT_ADDR_MAX_SF_LEGNTH 6
 
-#define CANTP_STD_ADDR_MAX_FF_LENGTH    6
+#define CANTP_STD_ADDR_MAX_FF_LENGTH 6
 
 /** max data length of CF with standard address */
-#define CANTP_STD_ADDR_MAX_CF_LENGTH    7
+#define CANTP_STD_ADDR_MAX_CF_LENGTH 7
 
 /** data offset of standard address */
-#define CANTP_STD_ADDR_SF_DATA_OFFSET   1
+#define CANTP_STD_ADDR_SF_DATA_OFFSET 1
 
 /** data offset of extended address */
-#define CANTP_EXT_ADDR_SF_DATA_OFFSET   2
+#define CANTP_EXT_ADDR_SF_DATA_OFFSET 2
 
 /** data offset of standard address */
-#define CANTP_STD_ADDR_FF_DATA_OFFSET   2
+#define CANTP_STD_ADDR_FF_DATA_OFFSET 2
 
-#define CANTP_STD_ADDR_CF_DATA_OFFSET   1
-#define CANTP_STD_ADDR_FC_BS_OFFSET     1
-#define CANTP_STD_ADDR_FC_STMIN_OFFSET  2
+#define CANTP_STD_ADDR_CF_DATA_OFFSET 1
+#define CANTP_STD_ADDR_FC_BS_OFFSET 1
+#define CANTP_STD_ADDR_FC_STMIN_OFFSET 2
 
-#define CANTP_SEGMENT_NUMBER_MASK       0x0fU
-#define CANTP_DRV_PDU_MAX_LENGTH        8
+#define CANTP_SEGMENT_NUMBER_MASK 0x0fU
+#define CANTP_DRV_PDU_MAX_LENGTH 8
 
-#define CANTP_TOTAL_CHANNEL_NUM	(CANTP_TX_CHANNEL_NUM + CANTP_RX_CHANNEL_NUM)
+#define CANTP_TOTAL_CHANNEL_NUM (CANTP_TX_CHANNEL_NUM + CANTP_RX_CHANNEL_NUM)
 
-#define CANTP_INDEX_NOT_FIND  0xFFU
+#define CANTP_INDEX_NOT_FIND 0xFFU
 
 /**=======[T Y P E   D E F I N I T I O N S]====================================*/
 typedef enum
@@ -140,7 +140,7 @@ typedef enum
     CANTP_WAITING_FOR_LAST_CF_TX_CONFIRMATION = 11,
     CANTP_WAITING_FOR_CF_TX_CONFIRMATION = 12,
     CANTP_WAITING_FOR_CF_BLOCK_TX_CONFIRMATION = 13,
-	WAITING_TX_FC_BUFFER = 14   
+    WAITING_TX_FC_BUFFER = 14
 } CanTp_StateType;
 
 typedef struct
@@ -184,7 +184,7 @@ typedef struct
     CanTp_PduType canFrameBuffer;
 
     /* Temp storage of Received block size*/
-    uint16 CanTp_ReceivedCFBlockSize;    
+    uint16 CanTp_ReceivedCFBlockSize;
 
 } CanTp_RunTime_DataType;
 
@@ -200,46 +200,46 @@ STATIC boolean CanTp_FramePaddingCheck(const PduInfoType *const CanTp_objRxPtr,
 #endif
 
 #ifdef CANTP_PADDING_ON
-STATIC void CanTp_FrameAddPadding(PduInfoType * const CanTp_pduInfo);
+STATIC void CanTp_FrameAddPadding(PduInfoType *const CanTp_pduInfo);
 #else
 #define CanTp_FrameAddPadding(x)
 #endif
 
-STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                     const CanTp_RxSduType * const CanTp_rxConfig,
-                                     const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                     const CanTp_RxSduType *const CanTp_rxConfig,
+                                     const PduInfoType *const CanTp_objRxPtr,
                                      const uint8 CanTp_length);
 
-STATIC void CanTp_ReceiveFirstFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                    const CanTp_RxSduType * const CanTp_rxConfig,
-                                    const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveFirstFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                    const CanTp_RxSduType *const CanTp_rxConfig,
+                                    const PduInfoType *const CanTp_objRxPtr,
                                     const PduLengthType pduLength);
 
-STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                          const CanTp_RxSduType * const CanTp_rxConfig,
-                                          const PduInfoType * const CanTp_objRxPtr);
+STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                          const CanTp_RxSduType *const CanTp_rxConfig,
+                                          const PduInfoType *const CanTp_objRxPtr);
 
-STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                          const CanTp_TxSduType * const CanTp_txConfig,
-                                          const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                          const CanTp_TxSduType *const CanTp_txConfig,
+                                          const PduInfoType *const CanTp_objRxPtr,
                                           const CanTp_Iso15765FrameType frameType);
 
-STATIC void CanTp_Init15765RuntimeData(CanTp_RunTime_DataType * const CanTp_runtime);
+STATIC void CanTp_Init15765RuntimeData(CanTp_RunTime_DataType *const CanTp_runtime);
 
-STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType * const CanTp_rxConfig,
-                                                     CanTp_RunTime_DataType * const CanTp_rxRuntime);
+STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType *const CanTp_rxConfig,
+                                                     CanTp_RunTime_DataType *const CanTp_rxRuntime);
 
 STATIC uint8 CanTp_FindTpRxIndicationIndexFromRxChannel(const PduIdType CanTp_pduId,
-                                                        const PduInfoType * const CanTp_objRxPtr,
-                                                        uint8 * const CanTp_tpci,
-                                                        uint8 * const CanTp_tpciOffset);
+                                                        const PduInfoType *const CanTp_objRxPtr,
+                                                        uint8 *const CanTp_tpci,
+                                                        uint8 *const CanTp_tpciOffset);
 
 STATIC uint8 CanTp_FindTpRxIndexFromTxChannel(const PduIdType CanTp_pduId);
 
 STATIC uint8 CanTp_FindTpListIndexFromRxPdu(const PduIdType CanTp_pduId,
-                                            const PduInfoType * const CanTp_objRxPtr,
-                                            CanTp_Iso15765FrameType * const CanTp_format,
-                                            PduLengthType * const pduLength);
+                                            const PduInfoType *const CanTp_objRxPtr,
+                                            CanTp_Iso15765FrameType *const CanTp_format,
+                                            PduLengthType *const pduLength);
 
 STATIC uint8 CanTp_FindTpTxConfirmIndexFromTxChannel(PduIdType const CanTp_txPduId);
 
@@ -247,55 +247,55 @@ STATIC uint8 CanTp_FindTpTxConfirmIndexFromRxChannel(PduIdType const CanTp_txPdu
 
 STATIC uint8 CanTp_FindTpTxListFromSduId(const PduIdType CanTp_SduId);
 
-STATIC CanTp_Iso15765FrameType CanTp_calcTxFrameType(const CanTp_RunTime_DataType * const CanTp_txRuntime);
+STATIC CanTp_Iso15765FrameType CanTp_calcTxFrameType(const CanTp_RunTime_DataType *const CanTp_txRuntime);
 
-STATIC void CanTp_SendFlowControlFrame(const CanTp_RxSduType * const CanTp_rxConfig,
-                                       CanTp_RunTime_DataType * const CanTp_rxRuntime,
+STATIC void CanTp_SendFlowControlFrame(const CanTp_RxSduType *const CanTp_rxConfig,
+                                       CanTp_RunTime_DataType *const CanTp_rxRuntime,
                                        BufReq_ReturnType const CanTp_flowStatus);
 
-STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType * const CanTp_txConfig,
-                                            CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                            PduInfoType * const CanTp_pduInfo,
+STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType *const CanTp_txConfig,
+                                            CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                            PduInfoType *const CanTp_pduInfo,
                                             const uint8 t_u1_actualPayload);
 
-STATIC void CanTp_SendSingleFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                  CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                  PduInfoType * const CanTp_pduInfo);
+STATIC void CanTp_SendSingleFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                  CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                  PduInfoType *const CanTp_pduInfo);
 
-STATIC void CanTp_SendFirstFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                 CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                 PduInfoType * const CanTp_pduInfo);
+STATIC void CanTp_SendFirstFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                 CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                 PduInfoType *const CanTp_pduInfo);
 
-STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                       CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                       PduInfoType * const CanTp_pduInfo);
+STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                       CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                       PduInfoType *const CanTp_pduInfo);
 
-STATIC void CanTp_SendTxFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                              CanTp_RunTime_DataType * const CanTp_txRuntime,
+STATIC void CanTp_SendTxFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                              CanTp_RunTime_DataType *const CanTp_txRuntime,
                               const CanTp_Iso15765FrameType CanTp_framType);
 
-STATIC void CanTp_WaitSForLastCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
-                                           CanTp_RunTime_DataType * const CanTp_runtimeItem);
+STATIC void CanTp_WaitSForLastCFBufProcess(const CanTp_RxSduType *const CanTp_rxConfig,
+                                           CanTp_RunTime_DataType *const CanTp_runtimeItem);
 
-STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
-                                   CanTp_RunTime_DataType * const CanTp_runtimeItem);
-								   
+STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType *const CanTp_rxConfig,
+                                   CanTp_RunTime_DataType *const CanTp_runtimeItem);
+
 STATIC void CanTp_WaitFCTxBufProcess(const CanTp_RxSduType *CanTp_rxConfig,
-						           CanTp_RunTime_DataType *CanTp_runtimeItem);  
+                                     CanTp_RunTime_DataType *CanTp_runtimeItem);
 
 /**=======[F U N C T I O N   I M P L E M E N T A T I O N S]====================*/
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_Init  
- * 
+ * @brief			:CanTp_Init
+ *
  * Service ID		: <CanTp_Init>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 void CanTp_Init(void)
@@ -313,29 +313,29 @@ void CanTp_Init(void)
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_RxIndication  
- * 
+ * @brief			:CanTp_RxIndication
+ *
  * Service ID		: <CanTp_RxIndication>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 void CanTp_RxIndication(const PduIdType CanTp_pduId,
-                        const PduInfoType * const CanTp_objRxPtr)
+                        const PduInfoType *const CanTp_objRxPtr)
 {
     /* SF, FF, CF, FC */
     CanTp_Iso15765FrameType frameType;
-    PduLengthType           pduLength;
+    PduLengthType pduLength;
 
     /* find */
-    uint8 const             CanTp_listIndex = CanTp_FindTpListIndexFromRxPdu(CanTp_pduId,
-                                                                             CanTp_objRxPtr,
-                                                                             &frameType,
-                                                                             &pduLength);
+    uint8 const CanTp_listIndex = CanTp_FindTpListIndexFromRxPdu(CanTp_pduId,
+                                                                 CanTp_objRxPtr,
+                                                                 &frameType,
+                                                                 &pduLength);
 
     if (CanTp_listIndex != (uint8)CANTP_INDEX_NOT_FIND)
     {
@@ -375,10 +375,8 @@ void CanTp_RxIndication(const PduIdType CanTp_pduId,
 
         case CANTP_FLOW_CONTROL_WT:
             /* wait flow control frame */
-            CanTp_RuntimeData[CanTp_listIndex + (uint8)CANTP_RX_CHANNEL_NUM].tpState
-                = CANTP_WAITING_FOR_FC_RX;
-            CanTp_RuntimeData[CanTp_listIndex + (uint8)CANTP_RX_CHANNEL_NUM].timeoutCounterValue 
-                = CanTp_ConvertMsToMainCycles((uint8)CANTP_N_BS);
+            CanTp_RuntimeData[CanTp_listIndex + (uint8)CANTP_RX_CHANNEL_NUM].tpState = CANTP_WAITING_FOR_FC_RX;
+            CanTp_RuntimeData[CanTp_listIndex + (uint8)CANTP_RX_CHANNEL_NUM].timeoutCounterValue = CanTp_ConvertMsToMainCycles((uint8)CANTP_N_BS);
             break;
 
         default:
@@ -395,21 +393,21 @@ void CanTp_RxIndication(const PduIdType CanTp_pduId,
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_TxConfirmation  
- * 
+ * @brief			:CanTp_TxConfirmation
+ *
  * Service ID		: <CanTp_TxConfirmation>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 void CanTp_TxConfirmation(const PduIdType CanTp_pduId)
 {
     /* find tp index from tx channel */
-    uint8                   CanTp_listIndex = CanTp_FindTpTxConfirmIndexFromTxChannel(CanTp_pduId);
+    uint8 CanTp_listIndex = CanTp_FindTpTxConfirmIndexFromTxChannel(CanTp_pduId);
     CanTp_RunTime_DataType *CanTp_runtimeItem;
     CanTp_RunTime_DataType *CanTp_rxRuntime;
 
@@ -441,7 +439,7 @@ void CanTp_TxConfirmation(const PduIdType CanTp_pduId)
         default:
             /* wrong state */
             Dcm_TxConfirmation(CanTp_TxSdu[CanTp_listIndex].txDcmId,
-                NTFRSLT_E_NOT_OK);
+                               NTFRSLT_E_NOT_OK);
             CanTp_Init15765RuntimeData(CanTp_runtimeItem);
             break;
         }
@@ -480,25 +478,25 @@ void CanTp_TxConfirmation(const PduIdType CanTp_pduId)
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_Transmit  
- * 
+ * @brief			:CanTp_Transmit
+ *
  * Service ID		: <CanTp_Transmit>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 void CanTp_Transmit(const PduIdType CanTp_txSduId,
-                    const PduInfoType * const CanTp_txInfoPtr)
+                    const PduInfoType *const CanTp_txInfoPtr)
 {
     /* point to the message transmitted */
     CanTp_RunTime_DataType *CanTp_txRuntime;
 
     /* find tp list index from SduId which should be send */
-    const uint8             CanTp_listIndex = CanTp_FindTpTxListFromSduId(CanTp_txSduId);
+    const uint8 CanTp_listIndex = CanTp_FindTpTxListFromSduId(CanTp_txSduId);
 
     if (CanTp_listIndex != (uint8)CANTP_INDEX_NOT_FIND)
     {
@@ -529,24 +527,24 @@ void CanTp_Transmit(const PduIdType CanTp_txSduId,
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_MainFunc  
- * 
+ * @brief			:CanTp_MainFunc
+ *
  * Service ID		: <CanTp_MainFunc>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 void CanTp_MainFunction(void)
 {
-    uint8                   mainLoop;
+    uint8 mainLoop;
     CanTp_Iso15765FrameType frameType;
     CanTp_RunTime_DataType *CanTp_runtimeItem = NULL_PTR;
 
-    for (mainLoop = (uint8)0; mainLoop < (uint8)CANTP_TOTAL_CHANNEL_NUM ; mainLoop++)
+    for (mainLoop = (uint8)0; mainLoop < (uint8)CANTP_TOTAL_CHANNEL_NUM; mainLoop++)
     {
         /* process every channel */
         CanTp_runtimeItem = &CanTp_RuntimeData[mainLoop];
@@ -554,10 +552,7 @@ void CanTp_MainFunction(void)
         if (CANTP_STATE_IDLE != CanTp_runtimeItem->tpState)
         {
 
-            if ((CANTP_WAITING_RX_CF_BUFFER == CanTp_runtimeItem->tpState)
-                || (CANTP_WAITING_RX_SF_BUFFER == CanTp_runtimeItem->tpState)
-                || (CANTP_WAITING_TX_BUFFER == CanTp_runtimeItem->tpState)
-	            ||(WAITING_TX_FC_BUFFER == CanTp_runtimeItem->tpState)) 
+            if ((CANTP_WAITING_RX_CF_BUFFER == CanTp_runtimeItem->tpState) || (CANTP_WAITING_RX_SF_BUFFER == CanTp_runtimeItem->tpState) || (CANTP_WAITING_TX_BUFFER == CanTp_runtimeItem->tpState) || (WAITING_TX_FC_BUFFER == CanTp_runtimeItem->tpState))
             {
 
                 /* for calc frame type, SF or FF */
@@ -580,7 +575,7 @@ void CanTp_MainFunction(void)
                     if (mainLoop < (uint8)CANTP_RX_CHANNEL_NUM)
                     {
                         /* wait CF buffer */
-                        CanTp_WaitCFBufProcess(&CanTp_RxSdu[mainLoop],CanTp_runtimeItem);
+                        CanTp_WaitCFBufProcess(&CanTp_RxSdu[mainLoop], CanTp_runtimeItem);
                     }
                     else
                     {
@@ -593,21 +588,20 @@ void CanTp_MainFunction(void)
                     frameType = CanTp_calcTxFrameType(CanTp_runtimeItem);
                     /* send fram SF or FF */
                     CanTp_SendTxFrame(&CanTp_TxSdu[mainLoop - (uint8)CANTP_RX_CHANNEL_NUM],
-                        CanTp_runtimeItem, frameType);
+                                      CanTp_runtimeItem, frameType);
                     break;
-					
-					 case WAITING_TX_FC_BUFFER:
-   			           if( mainLoop < CANTP_RX_CHANNEL_NUM )
-   						{
-   						    /* wait CF buffer */
-   							CanTp_WaitFCTxBufProcess(&CanTp_RxSdu[mainLoop], CanTp_runtimeItem);
-   						}
-   			           break;  
+
+                case WAITING_TX_FC_BUFFER:
+                    if (mainLoop < CANTP_RX_CHANNEL_NUM)
+                    {
+                        /* wait CF buffer */
+                        CanTp_WaitFCTxBufProcess(&CanTp_RxSdu[mainLoop], CanTp_runtimeItem);
+                    }
+                    break;
 
                 default:
                     break;
                 }
-
             }
             else
             {
@@ -634,7 +628,7 @@ void CanTp_MainFunction(void)
                         /* receive data time */
                         if (mainLoop < (uint8)CANTP_RX_CHANNEL_NUM)
                         {
-                            Dcm_RxIndication(CanTp_RxSdu[mainLoop].rxDcmId,NTFRSLT_E_NOT_OK);
+                            Dcm_RxIndication(CanTp_RxSdu[mainLoop].rxDcmId, NTFRSLT_E_NOT_OK);
                         }
                         else
                         {
@@ -666,7 +660,7 @@ void CanTp_MainFunction(void)
                     case CANTP_WAITING_FOR_CF_TX:
                         /* send CF */
                         CanTp_SendTxFrame(&CanTp_TxSdu[mainLoop - (uint8)CANTP_RX_CHANNEL_NUM],
-                            CanTp_runtimeItem, CANTP_CONSECUTIVE_FRAME);
+                                          CanTp_runtimeItem, CANTP_CONSECUTIVE_FRAME);
                         break;
 
                     default:
@@ -679,7 +673,7 @@ void CanTp_MainFunction(void)
                 }
             }
 
-        }/* end of CANTP_STATE_IDLE */
+        } /* end of CANTP_STATE_IDLE */
         else
         {
             /* empty */
@@ -690,15 +684,15 @@ void CanTp_MainFunction(void)
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_FramePaddingCheck  
- * 
+ * @brief			:CanTp_FramePaddingCheck
+ *
  * Service ID		: <CanTp_FramePaddingCheck>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 #ifdef CANTP_PADDING_CHECK
@@ -711,8 +705,8 @@ STATIC boolean CanTp_FramePaddingCheck(const PDU_INFO *const CanTp_objRxPtr,
     if (CANTP_DRV_PDU_MAX_LENGTH == CanTp_objRxPtr->SduLength)
     {
         for (loop = CanTp_checkDataOffset;
-            (loop < CANTP_DRV_PDU_MAX_LENGTH) && (TRUE == checkOk);
-            loop++)
+             (loop < CANTP_DRV_PDU_MAX_LENGTH) && (TRUE == checkOk);
+             loop++)
         {
             if (CANTP_PADDING_VALUE != CanTp_objRxPtr->SduDataPtr[loop])
             {
@@ -732,18 +726,18 @@ STATIC boolean CanTp_FramePaddingCheck(const PDU_INFO *const CanTp_objRxPtr,
 /********************************************************************************/
 /****
  * @brief			:if less than 8, add padding to message
- * 
+ *
  * Service ID		: <CanTp_FrameAddPadding>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 #ifdef CANTP_PADDING_ON
-STATIC void CanTp_FrameAddPadding(PduInfoType * const CanTp_pduInfo)
+STATIC void CanTp_FrameAddPadding(PduInfoType *const CanTp_pduInfo)
 {
     for (; CanTp_pduInfo->SduLength < (uint16)CANTP_DRV_PDU_MAX_LENGTH; CanTp_pduInfo->SduLength++)
     {
@@ -755,24 +749,24 @@ STATIC void CanTp_FrameAddPadding(PduInfoType * const CanTp_pduInfo)
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_ReceiveSingleFrame  
- * 
+ * @brief			:CanTp_ReceiveSingleFrame
+ *
  * Service ID		: <CanTp_ReceiveSingleFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                     const CanTp_RxSduType * const CanTp_rxConfig,
-                                     const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                     const CanTp_RxSduType *const CanTp_rxConfig,
+                                     const PduInfoType *const CanTp_objRxPtr,
                                      const uint8 CanTp_length)
 {
-    uint8   loop;
-    uint8   dataOffset;
+    uint8 loop;
+    uint8 dataOffset;
 #ifdef CANTP_PADDING_CHECK
     boolean paddingCheckOk = FALSE;
 #endif
@@ -790,7 +784,7 @@ STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType * const CanTp_rxRunt
 
 #ifdef CANTP_PADDING_CHECK
     /* padding check */
-    paddingCheckOk = CanTp_FramePaddingCheck(CanTp_objRxPtr, (CanTp_length+dataOffset));
+    paddingCheckOk = CanTp_FramePaddingCheck(CanTp_objRxPtr, (CanTp_length + dataOffset));
     if (TRUE == paddingCheckOk)
 #endif
     {
@@ -828,20 +822,20 @@ STATIC void CanTp_ReceiveSingleFrame(CanTp_RunTime_DataType * const CanTp_rxRunt
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_ReceiveFirstFrame  
- * 
+ * @brief			:CanTp_ReceiveFirstFrame
+ *
  * Service ID		: <CanTp_ReceiveFirstFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_ReceiveFirstFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                    const CanTp_RxSduType * const CanTp_rxConfig,
-                                    const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveFirstFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                    const CanTp_RxSduType *const CanTp_rxConfig,
+                                    const PduInfoType *const CanTp_objRxPtr,
                                     const PduLengthType pduLength)
 {
     uint8 loop;
@@ -883,28 +877,28 @@ STATIC void CanTp_ReceiveFirstFrame(CanTp_RunTime_DataType * const CanTp_rxRunti
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_ReceiveConsecutiveFrame  
- * 
+ * @brief			:CanTp_ReceiveConsecutiveFrame
+ *
  * Service ID		: <CanTp_ReceiveConsecutiveFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType * const CanTp_rxRuntime,
-                                          const CanTp_RxSduType * const CanTp_rxConfig,
-                                          const PduInfoType * const CanTp_objRxPtr)
+STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType *const CanTp_rxRuntime,
+                                          const CanTp_RxSduType *const CanTp_rxConfig,
+                                          const PduInfoType *const CanTp_objRxPtr)
 {
-    uint8        loop;
-    boolean      lastCF = FALSE;
-    uint8        dataCount;
+    uint8 loop;
+    boolean lastCF = FALSE;
+    uint8 dataCount;
     uint16 const bytesLeftToCopy = CanTp_rxRuntime->transferTotal - CanTp_rxRuntime->transferCount;
-    uint8 const  CanTp_sn = CanTp_objRxPtr->SduDataPtr[(uint8)0] & (uint8)CANTP_SEGMENT_NUMBER_MASK;
+    uint8 const CanTp_sn = CanTp_objRxPtr->SduDataPtr[(uint8)0] & (uint8)CANTP_SEGMENT_NUMBER_MASK;
 #ifdef CANTP_PADDING_CHECK
-    boolean      paddingCheckOk = FALSE;
+    boolean paddingCheckOk = FALSE;
 #endif
 
     if (CanTp_rxRuntime->tpState != CANTP_WAITING_FOR_CF_RX)
@@ -958,7 +952,7 @@ STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType * const CanTp_r
                 /* calc transfer counter */
                 CanTp_rxRuntime->transferCount += (uint16)dataCount;
 
-                CanTp_rxRuntime->CanTp_ReceivedCFBlockSize ++; 
+                CanTp_rxRuntime->CanTp_ReceivedCFBlockSize++;
                 if (TRUE == lastCF)
                 {
                     /* last cf, complete */
@@ -987,20 +981,20 @@ STATIC void CanTp_ReceiveConsecutiveFrame(CanTp_RunTime_DataType * const CanTp_r
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_ReceiveConsecutiveFrame  
- * 
+ * @brief			:CanTp_ReceiveConsecutiveFrame
+ *
  * Service ID		: <CanTp_ReceiveConsecutiveFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                          const CanTp_TxSduType * const CanTp_txConfig,
-                                          const PduInfoType * const CanTp_objRxPtr,
+STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                          const CanTp_TxSduType *const CanTp_txConfig,
+                                          const PduInfoType *const CanTp_objRxPtr,
                                           const CanTp_Iso15765FrameType frameType)
 {
 #ifdef CANTP_PADDING_CHECK
@@ -1030,9 +1024,7 @@ STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType * const CanTp_t
                     /* empty */
                 }
 
-                if (((CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] > (uint8)0x7FU)
-                  && (CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] < (uint8)0xF0U))
-                 || (CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] > (uint8)0xF9U))
+                if (((CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] > (uint8)0x7FU) && (CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] < (uint8)0xF0U)) || (CanTp_objRxPtr->SduDataPtr[(uint8)CANTP_STD_ADDR_FC_STMIN_OFFSET] > (uint8)0xF9U))
                 {
                     /* if STmin is reserved value */
                     Dcm_TxConfirmation(CanTp_txConfig->txDcmId, NTFRSLT_E_NOT_OK);
@@ -1080,18 +1072,18 @@ STATIC void CanTp_ReceiveFlowControlFrame(CanTp_RunTime_DataType * const CanTp_t
 
 /********************************************************************************/
 /****
- * @brief			:CanTp_Init15765RuntimeData  
- * 
+ * @brief			:CanTp_Init15765RuntimeData
+ *
  * Service ID		: <CanTp_Init15765RuntimeData>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_Init15765RuntimeData(CanTp_RunTime_DataType * const CanTp_runtime)
+STATIC void CanTp_Init15765RuntimeData(CanTp_RunTime_DataType *const CanTp_runtime)
 {
     CanTp_runtime->framesHandledCount = (uint8)0;
     CanTp_runtime->stmin = (uint8)0;
@@ -1103,28 +1095,28 @@ STATIC void CanTp_Init15765RuntimeData(CanTp_RunTime_DataType * const CanTp_runt
     CanTp_runtime->transferTotal = (uint16)0;
     CanTp_runtime->transferCount = (uint16)0;
     CanTp_runtime->canFrameBuffer.byteCount = (uint8)0;
-    CanTp_runtime->CanTp_ReceivedCFBlockSize = 0u;	  
+    CanTp_runtime->CanTp_ReceivedCFBlockSize = 0u;
     return;
 }
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_CopySegmentToRxBuffer  
- * 
+ * @brief			:CanTp_CopySegmentToRxBuffer
+ *
  * Service ID		: <CanTp_CopySegmentToRxBuffer>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType * const CanTp_rxConfig,
-                                                     CanTp_RunTime_DataType * const CanTp_rxRuntime)
+STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType *const CanTp_rxConfig,
+                                                     CanTp_RunTime_DataType *const CanTp_rxRuntime)
 {
     BufReq_ReturnType Can_ret = BUFREQ_E_NOT_OK;
-    uint8             loop;
+    uint8 loop;
 
     if (NULL_PTR == CanTp_rxRuntime->pdurBuffer)
     {
@@ -1138,8 +1130,7 @@ STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType * con
         /* empty */
     }
 
-    if ((CanTp_rxRuntime->pdurBuffer != NULL_PTR)
-     && (CanTp_rxRuntime->pdurBuffer->SduLength > CanTp_rxRuntime->pdurBufferCount))
+    if ((CanTp_rxRuntime->pdurBuffer != NULL_PTR) && (CanTp_rxRuntime->pdurBuffer->SduLength > CanTp_rxRuntime->pdurBufferCount))
     {
         Can_ret = BUFREQ_OK;
 
@@ -1148,8 +1139,7 @@ STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType * con
              loop++)
         {
             /* copy local buffer value to provided buffer from DCM */
-            CanTp_rxRuntime->pdurBuffer->SduDataPtr[CanTp_rxRuntime->pdurBufferCount]
-                = CanTp_rxRuntime->canFrameBuffer.data[loop];
+            CanTp_rxRuntime->pdurBuffer->SduDataPtr[CanTp_rxRuntime->pdurBufferCount] = CanTp_rxRuntime->canFrameBuffer.data[loop];
             CanTp_rxRuntime->transferCount++;
             CanTp_rxRuntime->pdurBufferCount++;
         }
@@ -1164,25 +1154,25 @@ STATIC BufReq_ReturnType CanTp_CopySegmentToRxBuffer(const CanTp_RxSduType * con
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpRxIndicationIndexFromRxChannel  
- * 
+ * @brief			:CanTp_FindTpRxIndicationIndexFromRxChannel
+ *
  * Service ID		: <CanTp_FindTpRxIndicationIndexFromRxChannel>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpRxIndicationIndexFromRxChannel(const PduIdType CanTp_pduId,
-                                                        const PduInfoType * const CanTp_objRxPtr,
-                                                        uint8 * const CanTp_tpci,
-                                                        uint8 * const CanTp_tpciOffset)
+                                                        const PduInfoType *const CanTp_objRxPtr,
+                                                        uint8 *const CanTp_tpci,
+                                                        uint8 *const CanTp_tpciOffset)
 {
-    uint8                   loop;
-    uint8                   index = (uint8)CANTP_INDEX_NOT_FIND;
-    const CanTp_RxSduType * CanTp_rxConfig;
+    uint8 loop;
+    uint8 index = (uint8)CANTP_INDEX_NOT_FIND;
+    const CanTp_RxSduType *CanTp_rxConfig;
 
     for (loop = (uint8)0;
          (loop < (uint8)CANTP_RX_CHANNEL_NUM) && ((uint8)CANTP_INDEX_NOT_FIND == index); loop++)
@@ -1190,12 +1180,7 @@ STATIC uint8 CanTp_FindTpRxIndicationIndexFromRxChannel(const PduIdType CanTp_pd
         CanTp_rxConfig = &CanTp_RxSdu[loop];
 
         /* check is this channel */
-        if ((CanTp_rxConfig->rxPduId == CanTp_pduId)
-         && (((CANTP_STANDARD == CanTp_rxConfig->addressingFormat)
-           && ((CanTp_objRxPtr->SduDataPtr[0] & (uint8)CANTP_TPCI_MASK) < (uint8)CANTP_TPCI_FC))
-          || ((CANTP_EXTENDED == CanTp_rxConfig->addressingFormat)
-           && (CanTp_rxConfig->nSa == CanTp_objRxPtr->SduDataPtr[0u])
-           && ((CanTp_objRxPtr->SduDataPtr[1] & (uint8)CANTP_TPCI_MASK) < (uint8)CANTP_TPCI_FC))))
+        if ((CanTp_rxConfig->rxPduId == CanTp_pduId) && (((CANTP_STANDARD == CanTp_rxConfig->addressingFormat) && ((CanTp_objRxPtr->SduDataPtr[0] & (uint8)CANTP_TPCI_MASK) < (uint8)CANTP_TPCI_FC)) || ((CANTP_EXTENDED == CanTp_rxConfig->addressingFormat) && (CanTp_rxConfig->nSa == CanTp_objRxPtr->SduDataPtr[0u]) && ((CanTp_objRxPtr->SduDataPtr[1] & (uint8)CANTP_TPCI_MASK) < (uint8)CANTP_TPCI_FC))))
         {
             if (CANTP_STANDARD == CanTp_rxConfig->addressingFormat)
             {
@@ -1220,15 +1205,15 @@ STATIC uint8 CanTp_FindTpRxIndicationIndexFromRxChannel(const PduIdType CanTp_pd
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpRxIndicationIndexFromTxChannel  
- * 
+ * @brief			:CanTp_FindTpRxIndicationIndexFromTxChannel
+ *
  * Service ID		: <CanTp_FindTpRxIndicationIndexFromTxChannel>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpRxIndexFromTxChannel(const PduIdType CanTp_pduId)
@@ -1256,26 +1241,26 @@ STATIC uint8 CanTp_FindTpRxIndexFromTxChannel(const PduIdType CanTp_pduId)
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpListIndexFromRxPdu  
- * 
+ * @brief			:CanTp_FindTpListIndexFromRxPdu
+ *
  * Service ID		: <CanTp_FindTpListIndexFromRxPdu>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpListIndexFromRxPdu(const PduIdType CanTp_pduId,
-                                            const PduInfoType * const CanTp_objRxPtr,
-                                            CanTp_Iso15765FrameType * const CanTp_format,
-                                            PduLengthType * const pduLength)
+                                            const PduInfoType *const CanTp_objRxPtr,
+                                            CanTp_Iso15765FrameType *const CanTp_format,
+                                            PduLengthType *const pduLength)
 {
-    uint8                   index;
-    uint8                   CanTp_tpci = (uint8)0;
-    uint8                   CanTp_tpciOffset = (uint8)0;
-    const CanTp_RxSduType * CanTp_rxConfig;
+    uint8 index;
+    uint8 CanTp_tpci = (uint8)0;
+    uint8 CanTp_tpciOffset = (uint8)0;
+    const CanTp_RxSduType *CanTp_rxConfig;
 
     /* find index from received message */
     index = CanTp_FindTpRxIndicationIndexFromRxChannel(CanTp_pduId, CanTp_objRxPtr,
@@ -1300,11 +1285,8 @@ STATIC uint8 CanTp_FindTpListIndexFromRxPdu(const PduIdType CanTp_pduId,
         {
         case CANTP_TPCI_SF:
             *CanTp_format = CANTP_SINGLE_FRAME;
-            *pduLength = (PduLengthType)(CanTp_objRxPtr->SduDataPtr[CanTp_tpciOffset]
-                                       & (uint8)CANTP_TPCI_DL);
-            if (((*pduLength > (uint16)CANTP_STD_ADDR_MAX_SF_LEGNTH) && (CANTP_STANDARD == CanTp_rxConfig->addressingFormat))
-             || ((*pduLength > (uint16)CANTP_EXT_ADDR_MAX_SF_LEGNTH) && (CANTP_EXTENDED == CanTp_rxConfig->addressingFormat))
-             || ((uint16)0 == *pduLength))
+            *pduLength = (PduLengthType)(CanTp_objRxPtr->SduDataPtr[CanTp_tpciOffset] & (uint8)CANTP_TPCI_DL);
+            if (((*pduLength > (uint16)CANTP_STD_ADDR_MAX_SF_LEGNTH) && (CANTP_STANDARD == CanTp_rxConfig->addressingFormat)) || ((*pduLength > (uint16)CANTP_EXT_ADDR_MAX_SF_LEGNTH) && (CANTP_EXTENDED == CanTp_rxConfig->addressingFormat)) || ((uint16)0 == *pduLength))
             {
                 /* error frame, if single frame length is 0 of the length is less than 6 or 7 */
                 *CanTp_format = CANTP_INVALID_FRAME;
@@ -1317,8 +1299,7 @@ STATIC uint8 CanTp_FindTpListIndexFromRxPdu(const PduIdType CanTp_pduId,
 
         case CANTP_TPCI_FF:
             *CanTp_format = CANTP_FIRST_FRAME;
-            *pduLength = ((PduLengthType)(CanTp_objRxPtr->SduDataPtr[(uint8)0] & (uint16)0xfU) << (uint8)8)
-                       + (PduLengthType)CanTp_objRxPtr->SduDataPtr[(uint8)1];
+            *pduLength = ((PduLengthType)(CanTp_objRxPtr->SduDataPtr[(uint8)0] & (uint16)0xfU) << (uint8)8) + (PduLengthType)CanTp_objRxPtr->SduDataPtr[(uint8)1];
             if (*pduLength < ((uint16)CANTP_STD_ADDR_MAX_SF_LEGNTH + (uint16)1))
             {
                 /* error frame, for this tp we only support standard frame */
@@ -1372,22 +1353,22 @@ STATIC uint8 CanTp_FindTpListIndexFromRxPdu(const PduIdType CanTp_pduId,
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpTxConfirmIndexFromTxChannel  
- * 
+ * @brief			:CanTp_FindTpTxConfirmIndexFromTxChannel
+ *
  * Service ID		: <CanTp_FindTpTxConfirmIndexFromTxChannel>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpTxConfirmIndexFromTxChannel(PduIdType const CanTp_txPduId)
 {
-    uint8                    loop;
-    uint8                    index = (uint8)CANTP_INDEX_NOT_FIND;
-    CanTp_RunTime_DataType * CanTp_txRuntime;
+    uint8 loop;
+    uint8 index = (uint8)CANTP_INDEX_NOT_FIND;
+    CanTp_RunTime_DataType *CanTp_txRuntime;
 
     for (loop = (uint8)0;
          (loop < (uint8)CANTP_TX_CHANNEL_NUM) && ((uint8)CANTP_INDEX_NOT_FIND == index);
@@ -1396,12 +1377,7 @@ STATIC uint8 CanTp_FindTpTxConfirmIndexFromTxChannel(PduIdType const CanTp_txPdu
         /* search tp index */
         CanTp_txRuntime = &CanTp_RuntimeData[loop + (uint8)CANTP_RX_CHANNEL_NUM];
 
-        if ((CanTp_TxSdu[loop].txPduId == CanTp_txPduId)
-          && ((CANTP_WAITING_FOR_SF_TX_CONFIRMATION == CanTp_txRuntime->tpState)
-          || (CANTP_WAITING_FOR_FF_TX_CONFIRMATION == CanTp_txRuntime->tpState)
-          || (CANTP_WAITING_FOR_CF_TX_CONFIRMATION == CanTp_txRuntime->tpState)
-          || (CANTP_WAITING_FOR_LAST_CF_TX_CONFIRMATION == CanTp_txRuntime->tpState)
-          || (CANTP_WAITING_FOR_CF_BLOCK_TX_CONFIRMATION == CanTp_txRuntime->tpState)))
+        if ((CanTp_TxSdu[loop].txPduId == CanTp_txPduId) && ((CANTP_WAITING_FOR_SF_TX_CONFIRMATION == CanTp_txRuntime->tpState) || (CANTP_WAITING_FOR_FF_TX_CONFIRMATION == CanTp_txRuntime->tpState) || (CANTP_WAITING_FOR_CF_TX_CONFIRMATION == CanTp_txRuntime->tpState) || (CANTP_WAITING_FOR_LAST_CF_TX_CONFIRMATION == CanTp_txRuntime->tpState) || (CANTP_WAITING_FOR_CF_BLOCK_TX_CONFIRMATION == CanTp_txRuntime->tpState)))
         {
             index = loop;
         }
@@ -1416,15 +1392,15 @@ STATIC uint8 CanTp_FindTpTxConfirmIndexFromTxChannel(PduIdType const CanTp_txPdu
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpTxConfirmIndexFromRxChannel  
- * 
+ * @brief			:CanTp_FindTpTxConfirmIndexFromRxChannel
+ *
  * Service ID		: <CanTp_FindTpTxConfirmIndexFromRxChannel>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpTxConfirmIndexFromRxChannel(PduIdType const CanTp_txPduId)
@@ -1450,7 +1426,7 @@ STATIC uint8 CanTp_FindTpTxConfirmIndexFromRxChannel(PduIdType const CanTp_txPdu
 
     for (loop = (uint8)0;
          (loop < (uint8)CANTP_RX_CHANNEL_NUM) && ((uint8)CANTP_INDEX_NOT_FIND == rx_Index);
-         loop ++)
+         loop++)
     {
         if ((CanTp_txPduId == CanTp_RxSdu[loop].txFcPduId) &&
             (CanTp_RxSdu[loop].rxPduId == CanTp_TxSdu[tx_Index].rxFcPduId))
@@ -1468,15 +1444,15 @@ STATIC uint8 CanTp_FindTpTxConfirmIndexFromRxChannel(PduIdType const CanTp_txPdu
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_FindTpTxListFromSduId  
- * 
+ * @brief			:CanTp_FindTpTxListFromSduId
+ *
  * Service ID		: <CanTp_FindTpTxListFromSduId>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
 STATIC uint8 CanTp_FindTpTxListFromSduId(const PduIdType CanTp_SduId)
@@ -1503,18 +1479,18 @@ STATIC uint8 CanTp_FindTpTxListFromSduId(const PduIdType CanTp_SduId)
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_calcTxFrameType  
- * 
+ * @brief			:CanTp_calcTxFrameType
+ *
  * Service ID		: <CanTp_calcTxFrameType>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC CanTp_Iso15765FrameType CanTp_calcTxFrameType(const CanTp_RunTime_DataType * const CanTp_txRuntime)
+STATIC CanTp_Iso15765FrameType CanTp_calcTxFrameType(const CanTp_RunTime_DataType *const CanTp_txRuntime)
 {
     CanTp_Iso15765FrameType Can_ret = CANTP_INVALID_FRAME;
 
@@ -1535,23 +1511,23 @@ STATIC CanTp_Iso15765FrameType CanTp_calcTxFrameType(const CanTp_RunTime_DataTyp
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_SendFlowControlFrame  
- * 
+ * @brief			:CanTp_SendFlowControlFrame
+ *
  * Service ID		: <CanTp_SendFlowControlFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_SendFlowControlFrame(const CanTp_RxSduType * const CanTp_rxConfig,
-                                       CanTp_RunTime_DataType * const CanTp_rxRuntime,
+STATIC void CanTp_SendFlowControlFrame(const CanTp_RxSduType *const CanTp_rxConfig,
+                                       CanTp_RunTime_DataType *const CanTp_rxRuntime,
                                        BufReq_ReturnType const CanTp_flowStatus)
 {
     PduInfoType CanTp_pduInfo;
-    uint8       sduData[8];
+    uint8 sduData[8];
 
     CanTp_pduInfo.SduDataPtr = sduData;
     CanTp_pduInfo.SduLength = (uint16)0;
@@ -1586,24 +1562,24 @@ STATIC void CanTp_SendFlowControlFrame(const CanTp_RxSduType * const CanTp_rxCon
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_CopyDataToMsgFromTxBuf  
- * 
+ * @brief			:CanTp_CopyDataToMsgFromTxBuf
+ *
  * Service ID		: <CanTp_CopyDataToMsgFromTxBuf>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType * const CanTp_txConfig,
-                                            CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                            PduInfoType * const CanTp_pduInfo,
+STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType *const CanTp_txConfig,
+                                            CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                            PduInfoType *const CanTp_pduInfo,
                                             const uint8 t_u1_actualPayload)
 {
     boolean framPrepare = FALSE;
-    uint8   loop;
+    uint8 loop;
 
     if (NULL_PTR == CanTp_txRuntime->pdurBuffer)
     {
@@ -1621,8 +1597,7 @@ STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType * const CanTp_
         for (loop = (uint8)0; loop < t_u1_actualPayload; loop++)
         {
             /* copy local buffer to provided buffer by DCM */
-            CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength]
-                = CanTp_txRuntime->pdurBuffer->SduDataPtr[CanTp_txRuntime->pdurBufferCount];
+            CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] = CanTp_txRuntime->pdurBuffer->SduDataPtr[CanTp_txRuntime->pdurBufferCount];
             CanTp_txRuntime->transferCount++;
             CanTp_pduInfo->SduLength++;
             CanTp_txRuntime->pdurBufferCount++;
@@ -1642,20 +1617,20 @@ STATIC boolean CanTp_CopyDataToMsgFromTxBuf(const CanTp_TxSduType * const CanTp_
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_SendSingleFrame  
- * 
+ * @brief			:CanTp_SendSingleFrame
+ *
  * Service ID		: <CanTp_SendSingleFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_SendSingleFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                  CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                  PduInfoType * const CanTp_pduInfo)
+STATIC void CanTp_SendSingleFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                  CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                  PduInfoType *const CanTp_pduInfo)
 {
     boolean framPrepare;
 
@@ -1684,29 +1659,28 @@ STATIC void CanTp_SendSingleFrame(const CanTp_TxSduType * const CanTp_txConfig,
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_SendFirstFrame  
- * 
+ * @brief			:CanTp_SendFirstFrame
+ *
  * Service ID		: <CanTp_SendFirstFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_SendFirstFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                 CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                 PduInfoType * const CanTp_pduInfo)
+STATIC void CanTp_SendFirstFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                 CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                 PduInfoType *const CanTp_pduInfo)
 {
     const uint8 sfActualPayload = (uint8)CANTP_STD_ADDR_MAX_FF_LENGTH;
-    boolean     framPrepare;
+    boolean framPrepare;
 
-    CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] = (uint8)CANTP_TPCI_FF
-                   | (uint8)((CanTp_txRuntime->transferTotal & (uint16)0x0f00U) >> (uint8)8);
+    CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] = (uint8)CANTP_TPCI_FF | (uint8)((CanTp_txRuntime->transferTotal & (uint16)0x0f00U) >> (uint8)8);
     CanTp_pduInfo->SduLength++;
     CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] =
-                   (uint8)(CanTp_txRuntime->transferTotal & (uint16)0xffu);
+        (uint8)(CanTp_txRuntime->transferTotal & (uint16)0xffu);
     CanTp_pduInfo->SduLength++;
 
     framPrepare = CanTp_CopyDataToMsgFromTxBuf(CanTp_txConfig, CanTp_txRuntime,
@@ -1729,27 +1703,26 @@ STATIC void CanTp_SendFirstFrame(const CanTp_TxSduType * const CanTp_txConfig,
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_SendConsecutiveFrame  
- * 
+ * @brief			:CanTp_SendConsecutiveFrame
+ *
  * Service ID		: <CanTp_SendConsecutiveFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                                       CanTp_RunTime_DataType * const CanTp_txRuntime,
-                                       PduInfoType * const CanTp_pduInfo)
+STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                                       CanTp_RunTime_DataType *const CanTp_txRuntime,
+                                       PduInfoType *const CanTp_pduInfo)
 {
-    uint8        cfActualPayload;
-    boolean      lastFrame = FALSE;
+    uint8 cfActualPayload;
+    boolean lastFrame = FALSE;
     const uint16 txDataRemain = CanTp_txRuntime->transferTotal - CanTp_txRuntime->transferCount;
 
-    CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] = (uint8)CANTP_TPCI_CF
-                                                        + CanTp_txRuntime->framesHandledCount;
+    CanTp_pduInfo->SduDataPtr[CanTp_pduInfo->SduLength] = (uint8)CANTP_TPCI_CF + CanTp_txRuntime->framesHandledCount;
     CanTp_pduInfo->SduLength++;
 
     /* Calculate number of valid bytes that reside in this CF */
@@ -1801,8 +1774,7 @@ STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType * const CanTp_txCon
         }
     }
 
-    CanTp_txRuntime->framesHandledCount = (CanTp_txRuntime->framesHandledCount + (uint8)1)
-                                        & (uint8)CANTP_SEGMENT_NUMBER_MASK;
+    CanTp_txRuntime->framesHandledCount = (CanTp_txRuntime->framesHandledCount + (uint8)1) & (uint8)CANTP_SEGMENT_NUMBER_MASK;
 
     /* send frame */
     (void)CanIf_Transmit(CanTp_txConfig->txPduId, CanTp_pduInfo);
@@ -1810,22 +1782,22 @@ STATIC void CanTp_SendConsecutiveFrame(const CanTp_TxSduType * const CanTp_txCon
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_SendTxFrame  
- * 
+ * @brief			:CanTp_SendTxFrame
+ *
  * Service ID		: <CanTp_SendTxFrame>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_SendTxFrame(const CanTp_TxSduType * const CanTp_txConfig,
-                              CanTp_RunTime_DataType * const CanTp_txRuntime,
+STATIC void CanTp_SendTxFrame(const CanTp_TxSduType *const CanTp_txConfig,
+                              CanTp_RunTime_DataType *const CanTp_txRuntime,
                               const CanTp_Iso15765FrameType CanTp_framType)
 {
-    uint8       sduData[CANTP_DRV_PDU_MAX_LENGTH];
+    uint8 sduData[CANTP_DRV_PDU_MAX_LENGTH];
     PduInfoType CanTp_pduInfo;
 
     CanTp_pduInfo.SduDataPtr = sduData;
@@ -1859,19 +1831,19 @@ STATIC void CanTp_SendTxFrame(const CanTp_TxSduType * const CanTp_txConfig,
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_WaitSForLastCFBufProcess  
- * 
+ * @brief			:CanTp_WaitSForLastCFBufProcess
+ *
  * Service ID		: <CanTp_WaitSForLastCFBufProcess>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_WaitSForLastCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
-                                           CanTp_RunTime_DataType * const CanTp_runtimeItem)
+STATIC void CanTp_WaitSForLastCFBufProcess(const CanTp_RxSduType *const CanTp_rxConfig,
+                                           CanTp_RunTime_DataType *const CanTp_runtimeItem)
 {
     const BufReq_ReturnType Can_ret = CanTp_CopySegmentToRxBuffer(CanTp_rxConfig, CanTp_runtimeItem);
 
@@ -1891,19 +1863,19 @@ STATIC void CanTp_WaitSForLastCFBufProcess(const CanTp_RxSduType * const CanTp_r
 
 /********************************************************************************/
 /***
- * @brief			:CanTp_WaitCFBufProcess  
- * 
+ * @brief			:CanTp_WaitCFBufProcess
+ *
  * Service ID		: <CanTp_WaitCFBufProcess>
  * Sync/Async		: <Synchronous>
  * Reentrancy		: <Reentrant>
  * @param[in]		: <NONE>
  * @param[out]	    : <NONE>
  * @param[in/out]	: <NONE>
- * @return		    : <NONE>    
+ * @return		    : <NONE>
  */
 /********************************************************************************/
-STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
-                                   CanTp_RunTime_DataType * const CanTp_runtimeItem)
+STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType *const CanTp_rxConfig,
+                                   CanTp_RunTime_DataType *const CanTp_runtimeItem)
 {
     const BufReq_ReturnType Can_ret = CanTp_CopySegmentToRxBuffer(CanTp_rxConfig,
                                                                   CanTp_runtimeItem);
@@ -1922,7 +1894,6 @@ STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
     }
 }
 
-
 /********************************************************************************/
 /***
  * @brief			:CanTp_WaitCFBufProcess
@@ -1937,11 +1908,10 @@ STATIC void CanTp_WaitCFBufProcess(const CanTp_RxSduType * const CanTp_rxConfig,
  */
 /********************************************************************************/
 STATIC void CanTp_WaitFCTxBufProcess(const CanTp_RxSduType *CanTp_rxConfig,
-						           CanTp_RunTime_DataType *CanTp_runtimeItem)
+                                     CanTp_RunTime_DataType *CanTp_runtimeItem)
 {
-		/* sent FC Frame */
-		CanTp_runtimeItem->tpState = CANTP_WAITING_FOR_FC_CTS_TX_CONFIRMATION;
-		CanTp_SendFlowControlFrame(CanTp_rxConfig, CanTp_runtimeItem, BUFREQ_OK);
-}  
+    /* sent FC Frame */
+    CanTp_runtimeItem->tpState = CANTP_WAITING_FOR_FC_CTS_TX_CONFIRMATION;
+    CanTp_SendFlowControlFrame(CanTp_rxConfig, CanTp_runtimeItem, BUFREQ_OK);
+}
 /***=======[E N D   O F   F I L E]==============================================*/
-

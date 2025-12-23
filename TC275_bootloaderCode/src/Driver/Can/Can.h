@@ -1,25 +1,25 @@
 /*============================================================================*/
 /*  Copyright (C) 2009-2018, iSOFT INFRASTRUCTURE SOFTWARE CO.,LTD.
- *  
- *  All rights reserved. This software is iSOFT property. Duplication 
+ *
+ *  All rights reserved. This software is iSOFT property. Duplication
  *  or disclosure without iSOFT written authorization is prohibited.
- *  
- *  
+ *
+ *
  *  @file       <Can.h>
  *  @brief      <Can driver module header file>
- *  
+ *
  * <Compiler: HighTec4.6    MCU:TC27x>
  *
- *  @author     <jianan.liu>
+ *  @author     <10086>
  *  @date       <03-18-2018>
  */
 /*============================================================================*/
-#ifndef  CAN_H
-#define  CAN_H
+#ifndef CAN_H
+#define CAN_H
 
 /*=======[R E V I S I O N   H I S T O R Y]====================================*/
 /*  <VERSION>    <DATE>    <AUTHOR>    <REVISION LOG>
- *  V1.0.0       20180318  jianan.liu   Initial version
+ *  V1.0.0       20180318  10086   Initial version
  *                                      these features not support in this version:
  *                                      1. multiple Can Drivers.
  *                                      2. Can transceiver.
@@ -29,13 +29,13 @@
 
 /*=======[V E R S I O N  I N F O R M A T I O N]===============================*/
 /* @req <CAN085> Source File Version Information  */
-#define CAN_H_AR_MAJOR_VERSION  2
-#define CAN_H_AR_MINOR_VERSION  4
-#define CAN_H_AR_PATCH_VERSION  0
+#define CAN_H_AR_MAJOR_VERSION 2
+#define CAN_H_AR_MINOR_VERSION 4
+#define CAN_H_AR_PATCH_VERSION 0
 
-#define CAN_H_SW_MAJOR_VERSION  1
-#define CAN_H_SW_MINOR_VERSION  0
-#define CAN_H_SW_PATCH_VERSION  1
+#define CAN_H_SW_MAJOR_VERSION 1
+#define CAN_H_SW_MINOR_VERSION 0
+#define CAN_H_SW_PATCH_VERSION 1
 
 /*=======[I N C L U D E S]====================================================*/
 /*@req <CAN047>*/
@@ -48,28 +48,28 @@
 
 /*=======[M A C R O S]========================================================*/
 /* Service (API) ID for DET reporting */
-#define CAN_INIT_ID                             0x00U
-#define CAN_MAINFUCTION_WRITE_ID                0x01U
-#define CAN_INITCONTROLLER_ID                   0x02U
-#define CAN_SETCONTROLLERMODE_ID                0x03U
-#define CAN_DISABLECONTROLLERINTERRUPTS_ID      0x04U
-#define CAN_ENABLECONTROLLERINTERRUPTS_ID       0x05U
-#define CAN_WRITE_ID                            0x06U
-#define CAN_GETVERSIONINFO_ID                   0x07U
-#define CAN_MAINFUNCTION_READ_ID                0x08U
-#define CAN_MAINFUNCTION_BUSOFF_ID              0x09U
-#define CAN_MAINFUNCTION_WAKEUP_ID              0x0AU
-#define CAN_CBK_CHECKWAKEUP_ID                  0x0BU
+#define CAN_INIT_ID 0x00U
+#define CAN_MAINFUCTION_WRITE_ID 0x01U
+#define CAN_INITCONTROLLER_ID 0x02U
+#define CAN_SETCONTROLLERMODE_ID 0x03U
+#define CAN_DISABLECONTROLLERINTERRUPTS_ID 0x04U
+#define CAN_ENABLECONTROLLERINTERRUPTS_ID 0x05U
+#define CAN_WRITE_ID 0x06U
+#define CAN_GETVERSIONINFO_ID 0x07U
+#define CAN_MAINFUNCTION_READ_ID 0x08U
+#define CAN_MAINFUNCTION_BUSOFF_ID 0x09U
+#define CAN_MAINFUNCTION_WAKEUP_ID 0x0AU
+#define CAN_CBK_CHECKWAKEUP_ID 0x0BU
 
 /* API parameter checking */
-#define CAN_E_PARAM_POINTER                     0x01U
-#define CAN_E_PARAM_HANDLE                      0x02U
-#define CAN_E_PARAM_DLC                         0x03U
-#define CAN_E_PARAM_CONTROLLER                  0x04U
+#define CAN_E_PARAM_POINTER 0x01U
+#define CAN_E_PARAM_HANDLE 0x02U
+#define CAN_E_PARAM_DLC 0x03U
+#define CAN_E_PARAM_CONTROLLER 0x04U
 
 /* CAN state checking */
-#define CAN_E_UNINIT                            0x05U
-#define CAN_E_TRANSITION                        0x06U
+#define CAN_E_UNINIT 0x05U
+#define CAN_E_TRANSITION 0x06U
 
 /*=======[T Y P E   D E F I N I T I O N S]====================================*/
 /* Return values of CAN Driver API.*/
@@ -105,8 +105,8 @@ typedef uint32 Can_IdType;
 /*  This type is used to provide ID,DLC and SDU from CAN interface to CAN driver.*/
 typedef struct
 {
-	/* Pointer to L-PDU */
-    uint8* sdu;
+    /* Pointer to L-PDU */
+    uint8 *sdu;
 
     /* CANID */
     Can_IdType id;
@@ -135,9 +135,9 @@ typedef enum
 } Can_ObjectTypeType;
 
 /** This enum specifies whether the IdValue is of type
-  * - standard identifier - extended identifier - mixed mode 
-  * ImplementationType: Can_IdType_Type  
-  */
+ * - standard identifier - extended identifier - mixed mode
+ * ImplementationType: Can_IdType_Type
+ */
 typedef enum
 {
     CAN_ID_TYPE_EXTENDED,
@@ -149,11 +149,11 @@ typedef enum
 } Can_IdTypeType;
 
 /*
- * Specifies the type (Full-CAN or Basic-CAN) of a hardware object. 
+ * Specifies the type (Full-CAN or Basic-CAN) of a hardware object.
  */
 typedef enum
 {
-	/* several L-PDUS are handled */
+    /* several L-PDUS are handled */
     CAN_HANDLE_TYPE_BASIC,
 
     /* only one L-PDU is handled */
@@ -272,7 +272,7 @@ extern const Can_ControllerConfigType Can_ControllerConfigData[CAN_MAX_CONTROLLE
  * CallByAPI           <None>
  */
 /******************************************************************************/
-extern void Can_Init(const Can_ConfigType* Config);
+extern void Can_Init(const Can_ConfigType *Config);
 
 #if (STD_ON == CAN_VERSION_INFO_API)
 /******************************************************************************/
@@ -291,33 +291,35 @@ extern void Can_Init(const Can_ConfigType* Config);
 /******************************************************************************/
 /*@req <CAN252>*/
 #if (STD_ON == CAN_DEV_ERROR_DETECT)
-#define Can_GetVersionInfo(versionInfo) \
-    do{ \
-        if (NULL_PTR == (versionInfo))\
-        { \
-            Det_ReportError(CAN_MODULE_ID, CAN_INSTANCE,  \
-                    CAN_GETVERSIONINFO_ID, CAN_E_PARAM_POINTER);\
-        }\
-        else\
-        {\
-            ((Std_VersionInfoType *)(versionInfo))->vendorID   = CAN_VENDOR_ID; \
-            ((Std_VersionInfoType *)(versionInfo))->moduleID   = CAN_MODULE_ID; \
-            ((Std_VersionInfoType *)(versionInfo))->instanceID = CAN_INSTANCE;  \
+#define Can_GetVersionInfo(versionInfo)                                                      \
+    do                                                                                       \
+    {                                                                                        \
+        if (NULL_PTR == (versionInfo))                                                       \
+        {                                                                                    \
+            Det_ReportError(CAN_MODULE_ID, CAN_INSTANCE,                                     \
+                            CAN_GETVERSIONINFO_ID, CAN_E_PARAM_POINTER);                     \
+        }                                                                                    \
+        else                                                                                 \
+        {                                                                                    \
+            ((Std_VersionInfoType *)(versionInfo))->vendorID = CAN_VENDOR_ID;                \
+            ((Std_VersionInfoType *)(versionInfo))->moduleID = CAN_MODULE_ID;                \
+            ((Std_VersionInfoType *)(versionInfo))->instanceID = CAN_INSTANCE;               \
             ((Std_VersionInfoType *)(versionInfo))->sw_major_version = CAN_SW_MAJOR_VERSION; \
             ((Std_VersionInfoType *)(versionInfo))->sw_minor_version = CAN_SW_MINOR_VERSION; \
             ((Std_VersionInfoType *)(versionInfo))->sw_patch_version = CAN_SW_PATCH_VERSION; \
-        }\
-    }while(0)
+        }                                                                                    \
+    } while (0)
 #else
-#define Can_GetVersionInfo(versionInfo) \
-    do{ \
-        ((Std_VersionInfoType *)(versionInfo))->vendorID   = CAN_VENDOR_ID; \
-        ((Std_VersionInfoType *)(versionInfo))->moduleID   = CAN_MODULE_ID; \
-        ((Std_VersionInfoType *)(versionInfo))->instanceID = CAN_INSTANCE;  \
+#define Can_GetVersionInfo(versionInfo)                                                  \
+    do                                                                                   \
+    {                                                                                    \
+        ((Std_VersionInfoType *)(versionInfo))->vendorID = CAN_VENDOR_ID;                \
+        ((Std_VersionInfoType *)(versionInfo))->moduleID = CAN_MODULE_ID;                \
+        ((Std_VersionInfoType *)(versionInfo))->instanceID = CAN_INSTANCE;               \
         ((Std_VersionInfoType *)(versionInfo))->sw_major_version = CAN_SW_MAJOR_VERSION; \
         ((Std_VersionInfoType *)(versionInfo))->sw_minor_version = CAN_SW_MINOR_VERSION; \
         ((Std_VersionInfoType *)(versionInfo))->sw_patch_version = CAN_SW_PATCH_VERSION; \
-    }while(0)
+    } while (0)
 #endif /* STD_ON == CAN_DEV_ERROR_DETECT */
 
 #endif /* STD_ON == CAN_VERSION_INFO_API */
@@ -336,11 +338,11 @@ extern void Can_Init(const Can_ConfigType* Config);
  * CallByAPI           <None>
  */
 /******************************************************************************/
-extern void Can_InitController(uint8 Controller, const Can_ControllerConfigType* Config);
+extern void Can_InitController(uint8 Controller, const Can_ControllerConfigType *Config);
 
 /******************************************************************************/
 /*
- * Brief               <This function performs software triggered state transitions 
+ * Brief               <This function performs software triggered state transitions
  *                         of the CAN controller State machine.>
  * ServiceId           <0x03>
  * Sync/Async          <Asynchronous>
@@ -419,11 +421,11 @@ extern Can_ReturnType Can_Write(uint8 Hth, const Can_PduType *PduInfo);
  * CallByAPI           <None>
  */
 /******************************************************************************/
-extern Std_ReturnType  Can_Cbk_CheckWakeup(uint8 Controller);
+extern Std_ReturnType Can_Cbk_CheckWakeup(uint8 Controller);
 
 /******************************************************************************/
 /*
- * Brief               <This function performs the polling of TX confirmation and TX cancellation 
+ * Brief               <This function performs the polling of TX confirmation and TX cancellation
  *                          confirmation when.CAN_TX_PROCESSING is set to POLLING. >
  * ServiceId           <0x01>
  * Param-Name[in]      <None>
@@ -438,8 +440,8 @@ extern void Can_MainFunction_Write(void);
 
 /******************************************************************************/
 /*
- * Brief               <This function performs the polling of RX indications when 
- *                          CAN_RX_PROCESSING is set to POLLING.> 
+ * Brief               <This function performs the polling of RX indications when
+ *                          CAN_RX_PROCESSING is set to POLLING.>
  * ServiceId           <0x08>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -454,7 +456,7 @@ extern void Can_MainFunction_Read(void);
 /******************************************************************************/
 /*
  * Brief               <This function performs the polling of bus-off events that are configured
- *                          statically as "to be polled".> 
+ *                          statically as "to be polled".>
  * ServiceId           <0x09>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -469,7 +471,7 @@ extern void Can_MainFunction_BusOff(void);
 /******************************************************************************/
 /*
  * Brief               <This function performs the polling of wake-up events that are configured
- *                          statically as "to be polled".> 
+ *                          statically as "to be polled".>
  * ServiceId           <0x0a>
  * Param-Name[in]      <None>
  * Param-Name[out]     <None>
@@ -479,7 +481,7 @@ extern void Can_MainFunction_BusOff(void);
  * CallByAPI           <None>
  */
 /******************************************************************************/
-extern void  Can_MainFunction_Wakeup(void);
+extern void Can_MainFunction_Wakeup(void);
 
 /******************************************************************************/
 /*
@@ -494,6 +496,6 @@ extern void  Can_MainFunction_Wakeup(void);
 /******************************************************************************/
 extern void Can_Deinit(void);
 
-#endif  /* #ifndef  CAN_H */
+#endif /* #ifndef  CAN_H */
 
 /*=======[E N D   O F   F I L E]==============================================*/

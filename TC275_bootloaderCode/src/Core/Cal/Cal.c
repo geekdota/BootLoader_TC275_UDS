@@ -175,23 +175,24 @@ void Cal_CrcInit(SecM_CRCType *curCrc)
  * @return              <NONE>    
  */
 /******************************************************************************/
-#ifdef daizhunsheng
-#define DAI_CRC32_POLYNOMIAL              (0xEDB88320UL)   /*!< CRC32 polynomial for crc calculation */
+#ifdef BootloaderVersion
+#define DAI_CRC32_POLYNOMIAL (0xEDB88320UL) /*!< CRC32 polynomial for crc calculation */
 #endif
 void Cal_CrcCal(SecM_CRCType *curCrc, const uint8 *buf, const uint32 size)
 {
     uint32 i;
-#ifdef daizhunsheng
+#ifdef BootloaderVersion
     uint8 idx;
 #endif
 #if (CAL_CRC32 == CAL_METHOD)
     for (i = 0UL; i < size; i++)
     {
-#if daizhunsheng
-    	*curCrc ^= (uint32)buf[i];
-    	for (idx = 0; idx < 8; idx++){
-    		*curCrc = (*curCrc & 0x00000001) ? ((*curCrc >> 1) ^ DAI_CRC32_POLYNOMIAL) : (*curCrc >> 1);
-    	}
+#if BootloaderVersion
+        *curCrc ^= (uint32)buf[i];
+        for (idx = 0; idx < 8; idx++)
+        {
+            *curCrc = (*curCrc & 0x00000001) ? ((*curCrc >> 1) ^ DAI_CRC32_POLYNOMIAL) : (*curCrc >> 1);
+        }
 #else
     	*curCrc = Cal_Crc32Tab[(*curCrc ^ (uint32)buf[i]) & 0xffu] ^ (*curCrc >> 8);
 #endif
